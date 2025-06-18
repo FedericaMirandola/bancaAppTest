@@ -54,7 +54,7 @@ public class RegolaClassificazioneController {
             regolaRepository.persist(nuova);
         }
 
-        return Response.ok("Nuove regole creata con successo!").build();
+        return Response.ok("Nuove regole create con successo!").build();
     }
 
     // endpoint per ottenere e modificare regola per ID della regola
