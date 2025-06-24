@@ -8,6 +8,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.coderit.banktestapp.dto.CredemAccountResponse;
 import it.coderit.banktestapp.dto.CredemTransactionResponse;
 import it.coderit.banktestapp.dto.CredemTransactionResponse.TransactionData;
 import it.coderit.banktestapp.model.Transaction;
@@ -68,6 +70,17 @@ public class TransactionService {
     // Proprietà di configurazione iniettata dal file application.properties
     @ConfigProperty(name = "credem.psu-id")
     String psuId; // ID dell'utente dei servizi di pagamento
+
+
+    @ConfigProperty(name = "scheduler.load-from-file", defaultValue = "false")
+    boolean loadFromFile;
+
+    @ConfigProperty(name = "scheduler.test-data.filenames")
+    List<String> testDataFilenames;
+
+    // ProprietÃ  per l'account ID predefinito/preferito/fallback
+    @ConfigProperty(name = "credem.default-account-id")
+    String defaultAccountIdForOperations;
 
     // --- Metodi di Business Logic ---
 
@@ -303,5 +316,41 @@ public class TransactionService {
 
         log.info("Importazione dal file {} completata. Movimenti salvati.", filename);
         return List.of(); // Questo metodo restituisce sempre una lista vuota dopo il salvataggio
+    }
+
+     public String getAccountIdForOperations() {
+        log.info("Tentativo di recuperare un accountId dinamico da CredemClient.");
+        String token = mockCbiAuthService.getAccessToken(); // Ottiene il token di autenticazione simulato
+
+        try {
+            // Effettua la chiamata al client REST per ottenere la lista degli account
+            CredemAccountResponse accountResponse = credemClient.getAccounts(psuId, token);
+
+            if (accountResponse != null && accountResponse.accounts != null && !accountResponse.accounts.isEmpty()) {
+                // 1. Cerca l'accountId configurato come preferito
+                Optional<String> preferredAccountId = accountResponse.accounts.stream()
+                    .filter(account -> defaultAccountIdForOperations.equals(account.resourceId))
+                    .map(account -> account.resourceId)
+                    .findFirst();
+
+                if (preferredAccountId.isPresent()) {
+                    log.info("AccountId preferito '{}' recuperato con successo dalla lista degli account.", preferredAccountId.get());
+                    return preferredAccountId.get();
+                } else {
+                    // 2. Se l'accountId preferito non Ã¨ nella lista, usa il primo disponibile
+                    String firstAccountId = accountResponse.accounts.get(0).resourceId;
+                    log.warn("AccountId preferito '{}' non trovato nella lista degli account. Utilizzo il primo account disponibile: {}", defaultAccountIdForOperations, firstAccountId);
+                    return firstAccountId;
+                }
+            } else {
+                // 3. Nessun account trovato, usa il default configurato come fallback
+                log.warn("Nessun account trovato tramite CredemClient. Utilizzo l'accountId predefinito di fallback: {}", defaultAccountIdForOperations);
+                return defaultAccountIdForOperations;
+            }
+        } catch (Exception e) {
+            // 4. Errore nella chiamata, usa il default configurato come fallback
+            log.error("Errore durante il recupero dinamico degli account da CredemClient. Utilizzo l'accountId predefinito di fallback: {}. Errore: {}", defaultAccountIdForOperations, e.getMessage());
+            return defaultAccountIdForOperations;
+        }
     }
 }

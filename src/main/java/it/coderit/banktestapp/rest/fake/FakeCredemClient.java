@@ -7,6 +7,7 @@ import java.io.InputStream;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.quarkus.arc.properties.IfBuildProperty;
+import it.coderit.banktestapp.dto.CredemAccountResponse;
 import it.coderit.banktestapp.dto.CredemTransactionResponse;
 import it.coderit.banktestapp.rest.CredemClient;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -46,6 +47,26 @@ public class FakeCredemClient implements CredemClient {
         } catch (Exception e) {
             System.err.println("Errore lettura/parsing JSON: " + e.getMessage());
             return new CredemTransactionResponse();
+        }
+    }
+
+    @Override
+    public CredemAccountResponse getAccounts(String psuId, String token) {
+        String resourcePath = "test-data/accounts.json"; 
+
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
+            if (inputStream == null) {
+                System.err.println("File account non trovato: " + resourcePath);
+                return new CredemAccountResponse(); 
+            }
+
+            CredemAccountResponse response = objectMapper.readValue(inputStream, CredemAccountResponse.class);
+            System.out.println("Account caricati da " + resourcePath + ": " + (response.accounts != null ? response.accounts.size() : 0));
+            return response;
+
+        } catch (Exception e) {
+            System.err.println("Errore lettura/parsing JSON account da " + resourcePath + ": " + e.getMessage());
+            return new CredemAccountResponse(); 
         }
     }
 }

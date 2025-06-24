@@ -2,6 +2,7 @@ package it.coderit.banktestapp.rest;
 
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
+import it.coderit.banktestapp.dto.CredemAccountResponse;
 import it.coderit.banktestapp.dto.CredemTransactionResponse;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.*;
@@ -24,5 +25,12 @@ public interface CredemClient {
         @QueryParam("offset") Integer offset,
         @HeaderParam("psu-id") String psuId,
         @HeaderParam("Authorization") String token 
+    );
+
+    @GET
+    @Path("/accounts")
+    CredemAccountResponse getAccounts (
+        @HeaderParam("psu-id") String psuId,
+        @HeaderParam("Authorization") String token
     );
 }
