@@ -1,3 +1,3 @@
-ALTER TABLE movimento
+ALTER TABLE transaction
     ALTER COLUMN currency TYPE VARCHAR(10),
-    DROP CONSTRAINT IF EXISTS movimento_currency_check;
+    DROP CONSTRAINT IF EXISTS transaction_currency_check;

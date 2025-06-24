@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS centro;
+DROP TABLE IF EXISTS center;

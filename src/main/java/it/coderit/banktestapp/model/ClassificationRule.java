@@ -6,24 +6,24 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "regola_classificazione")
-public class RegolaClassificazione {
+public class ClassificationRule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    public Long id;
 
     @Column(name = "parola_chiave", nullable = false, length = 255)
-    private String parolaChiave;
+    private String keyword;
 
     @Column(name = "json_rule", columnDefinition = "TEXT")
     private String jsonRule;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TipoCentro centro;
+    private CenterType center;
 
-    public TipoCentro getTipoCentro() {
-        return centro;
+    public CenterType getCenterType() {
+        return center;
     }
 
    

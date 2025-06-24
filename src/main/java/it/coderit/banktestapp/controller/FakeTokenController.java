@@ -16,6 +16,7 @@ import jakarta.ws.rs.core.Response;
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 @ApplicationScoped
 public class FakeTokenController {
+    
     @POST
     public Response generateToken(@FormParam("grant_type") String grantType,
             @FormParam("client_id") String clientId,

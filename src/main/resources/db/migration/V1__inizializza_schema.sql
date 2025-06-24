@@ -1,4 +1,4 @@
-CREATE TABLE centro (
+CREATE TABLE center (
     id BIGSERIAL PRIMARY KEY,
     nome TEXT NOT NULL,
     tipo TEXT NOT NULL 
@@ -7,10 +7,10 @@ CREATE TABLE centro (
 CREATE TABLE regola_classificazione (
     id BIGSERIAL PRIMARY KEY,
     parola_chiave TEXT NOT NULL,
-    centro_id BIGINT NOT NULL REFERENCES centro(id)
+    center_id BIGINT NOT NULL REFERENCES center(id)
 );
 
-CREATE TABLE movimento (
+CREATE TABLE transaction (
     id BIGSERIAL PRIMARY KEY,
     transaction_id TEXT,
     booking_date TIMESTAMPTZ,
@@ -24,5 +24,5 @@ CREATE TABLE movimento (
     additional_information TEXT,
     proprietary_bank_transaction_code TEXT,
     account_id TEXT,
-    centro_id BIGINT NOT NULL REFERENCES centro(id)
+    center_id BIGINT NOT NULL REFERENCES center(id)
 );

@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import it.coderit.banktestapp.model.Valuta;
+import it.coderit.banktestapp.model.Currency;
 import lombok.Data;
 
 @Data
@@ -28,7 +28,7 @@ public class CredemTransactionResponse {
         public String accountId;
 
         public static class Amount {
-            public Valuta currency;
+            public Currency currency;
             public BigDecimal amount;
         }
     }

@@ -3,7 +3,7 @@ package it.coderit.banktestapp.dto;
 import java.util.List;
 
 
-public class Regola {
+public class Rule {
     
-    public List<Condizioni> conditions;
+    public List<Conditions> conditions;
 }

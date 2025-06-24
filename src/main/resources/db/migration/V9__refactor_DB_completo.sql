@@ -1,14 +1,14 @@
-DROP TABLE IF EXISTS movimento CASCADE;
+DROP TABLE IF EXISTS transaction CASCADE;
 DROP TABLE IF EXISTS regola_classificazione CASCADE;
-DROP TABLE IF EXISTS centro CASCADE;
+DROP TABLE IF EXISTS center CASCADE;
 
 CREATE TABLE regola_classificazione (
     id BIGSERIAL PRIMARY KEY,
     parola_chiave TEXT NOT NULL,
-    centro VARCHAR(20) NOT NULL CHECK (centro IN ('COSTO', 'PROFITTO'))
+    center VARCHAR(20) NOT NULL CHECK (center IN ('COSTO', 'PROFITTO'))
 );
 
-CREATE TABLE movimento (
+CREATE TABLE transaction (
     id BIGSERIAL PRIMARY KEY,
     transaction_id TEXT,
     booking_date TIMESTAMPTZ,
@@ -22,5 +22,5 @@ CREATE TABLE movimento (
     additional_information TEXT,
     proprietary_bank_transaction_code TEXT,
     account_id TEXT,
-    centro VARCHAR(20) NOT NULL CHECK (centro IN ('COSTO', 'PROFITTO'))
+    center VARCHAR(20) NOT NULL CHECK (center IN ('COSTO', 'PROFITTO'))
 );

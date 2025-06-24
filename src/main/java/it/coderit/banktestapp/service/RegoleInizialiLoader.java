@@ -1,8 +1,8 @@
 package it.coderit.banktestapp.service;
 
-import it.coderit.banktestapp.model.RegolaClassificazione;
-import it.coderit.banktestapp.model.TipoCentro;
-import it.coderit.banktestapp.repository.RegolaClassificazioneRepository;
+import it.coderit.banktestapp.model.ClassificationRule;
+import it.coderit.banktestapp.model.CenterType;
+import it.coderit.banktestapp.repository.ClassificationRuleRepository;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -21,7 +21,7 @@ import io.quarkus.runtime.Startup;
 public class RegoleInizialiLoader {
 
     @Inject
-    RegolaClassificazioneRepository regolaRepo;
+    ClassificationRuleRepository regolaRepo;
 
     @Inject
     ObjectMapper objectMapper;
@@ -35,22 +35,22 @@ public class RegoleInizialiLoader {
     void inizializzaRegole() {
         if (regolaRepo.count() == 0) {
             try {
-                // Inizializza le regole di classificazione con JSON
+                // Inizializza le rules di classificazione con JSON
                 String jsonCosto = objectMapper.writeValueAsString(
                         Map.of("keywords", List.of("supermarket", "bolletta", "affitto", "acquisto")));
 
                 String jsonProfitto = objectMapper.writeValueAsString(
                         Map.of("keywords", List.of("fattura", "bonifico", "vendita", "deposito", "Consulting")));
 
-                RegolaClassificazione regolaCosto = new RegolaClassificazione();
-                regolaCosto.setCentro(TipoCentro.COSTO);
+                ClassificationRule regolaCosto = new ClassificationRule();
+                regolaCosto.setCenter(CenterType.COSTO);
                 regolaCosto.setJsonRule(jsonCosto);
-                regolaCosto.setParolaChiave("costo");
+                regolaCosto.setKeyword("costo");
 
-                RegolaClassificazione regolaProfitto = new RegolaClassificazione();
-                regolaProfitto.setCentro(TipoCentro.PROFITTO);
+                ClassificationRule regolaProfitto = new ClassificationRule();
+                regolaProfitto.setCenter(CenterType.PROFITTO);
                 regolaProfitto.setJsonRule(jsonProfitto);
-                regolaProfitto.setParolaChiave("profitto");
+                regolaProfitto.setKeyword("profitto");
 
                 regolaRepo.persist(regolaCosto);
                 regolaRepo.persist(regolaProfitto);
@@ -58,7 +58,7 @@ public class RegoleInizialiLoader {
                 System.out.println("Regole iniziali inserite correttamente.");
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new RuntimeException("Errore durante l'inizializzazione delle regole", e);
+                throw new RuntimeException("Errore durante l'inizializzazione delle rules", e);
             }
         } else {
             System.out.println("Regole già presenti, nessuna inizializzazione necessaria.");

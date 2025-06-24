@@ -12,9 +12,9 @@ import java.time.OffsetDateTime;
 
 @Data
 @Entity
-@Table(name = "movimento")
+@Table(name = "transaction")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Movimento{
+public class Transaction{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +32,6 @@ public class Movimento{
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     public OffsetDateTime valueDate;
 
-    
     @Column(length = 3)
     public String currency;
 
@@ -60,7 +59,7 @@ public class Movimento{
     @Column(length = 255, name = "account_id")
     public String accountId;
 
-    @Column(name = "centro", nullable = false)
+    @Column(name = "center", nullable = false)
     @Enumerated(EnumType.STRING)
-    public TipoCentro tipoCentro; 
+    public CenterType centerType; 
 }

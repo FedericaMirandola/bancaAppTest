@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class Condizioni {
+public class Conditions {
     
     public String field;
     public List<String> keywords;

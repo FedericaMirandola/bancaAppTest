@@ -4,12 +4,12 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import it.coderit.banktestapp.dto.Regola;
-import it.coderit.banktestapp.model.Movimento;
-import it.coderit.banktestapp.model.RegolaClassificazione;
-import it.coderit.banktestapp.model.TipoCentro;
+import it.coderit.banktestapp.dto.Rule;
+import it.coderit.banktestapp.model.Transaction;
+import it.coderit.banktestapp.model.ClassificationRule;
+import it.coderit.banktestapp.model.CenterType;
 
-import it.coderit.banktestapp.repository.RegolaClassificazioneRepository;
+import it.coderit.banktestapp.repository.ClassificationRuleRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -18,21 +18,21 @@ import jakarta.transaction.Transactional;
 public class RuleEngineService {
 
     @Inject
-    RegolaClassificazioneRepository regolaClassificazioneRepository;
+    ClassificationRuleRepository regolaClassificazioneRepository;
 
     @Inject
     ObjectMapper objectMapper;
 
     @Transactional
-    public void classifyMovimento(Movimento movimento) {
-        List<RegolaClassificazione> regole = regolaClassificazioneRepository.findAllRegole();
+    public void classifyTransaction(Transaction transaction) {
+        List<ClassificationRule> rules = regolaClassificazioneRepository.findAllRegole();
 
-        for (RegolaClassificazione regola : regole) {
+        for (ClassificationRule regola : rules) {
             try {
-                Regola rule = objectMapper.readValue(regola.getJsonRule(), Regola.class);
+                Rule rule = objectMapper.readValue(regola.getJsonRule(), Rule.class);
 
                 boolean matchesAll = rule.conditions.stream().allMatch(cond -> {
-                    String fieldValue = extractFieldValue(movimento, cond.field);
+                    String fieldValue = extractFieldValue(transaction, cond.field);
                     if (fieldValue == null)
                         return false;
                     return cond.keywords.stream()
@@ -40,7 +40,7 @@ public class RuleEngineService {
                 });
 
                 if (matchesAll) {
-                    movimento.setTipoCentro(regola.getTipoCentro());
+                    transaction.setCenterType(regola.getCenterType());
                     return;
                 }
             } catch (Exception e) {
@@ -48,23 +48,23 @@ public class RuleEngineService {
             }
         }
 
-        // Nessuna regola soddisfatta -> centro di default
-        movimento.setTipoCentro(TipoCentro.COSTO);
-        System.err.println("Nessuna regola applicata, applicato centro di default COSTO");
+        // Nessuna regola soddisfatta -> center di default
+        transaction.setCenterType(CenterType.COSTO);
+        System.err.println("Nessuna regola applicata, applicato center di default COSTO");
     }
 
-    private String extractFieldValue(Movimento movimento, String field) {
+    private String extractFieldValue(Transaction transaction, String field) {
         switch (field) {
             case "remittanceInformationUnstructured":
-                return movimento.getRemittanceInformation();
+                return transaction.getRemittanceInformation();
             case "DebtorName":
-                return movimento.getDebtorName();
+                return transaction.getDebtorName();
             case "CreditorName":
-                return movimento.getCreditorName();
+                return transaction.getCreditorName();
             case "bankTransactionCode":
-                return movimento.getBankTransactionCode();
+                return transaction.getBankTransactionCode();
             case "propietaryBankTransactionCode":
-                return movimento.getProprietaryBankTransactionCode();
+                return transaction.getProprietaryBankTransactionCode();
             default:
                 return null;
         }

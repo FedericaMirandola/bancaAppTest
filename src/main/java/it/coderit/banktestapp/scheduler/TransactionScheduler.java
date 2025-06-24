@@ -4,16 +4,16 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import io.quarkus.scheduler.Scheduled;
-import it.coderit.banktestapp.service.MovimentoService;
+import it.coderit.banktestapp.service.TransactionService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
-public class MovimentoScheduler {
+public class TransactionScheduler {
     
     @Inject
-    MovimentoService movimentoService;
+    TransactionService transactionService;
 
     @ConfigProperty(name = "scheduler.daysback", defaultValue = "1")
     int giorniIndietro;
@@ -30,7 +30,7 @@ public class MovimentoScheduler {
         String from = inizio.format(formatter);
         String to = oggi.format(formatter);
 
-        movimentoService.scaricaEMemorizzaMovimenti(accountId, from, to);
+        transactionService.downloadAndSave(accountId, from, to);
     }
 }
 
