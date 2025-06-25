@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import it.coderit.banktestapp.dto.CredemAccountResponse;
 import it.coderit.banktestapp.dto.CredemTransactionResponse;
 import it.coderit.banktestapp.dto.CredemTransactionResponse.TransactionData;
+import it.coderit.banktestapp.dto.CredemSingleAccountResponse;
+import it.coderit.banktestapp.dto.CredemBalancesResponse;
 import it.coderit.banktestapp.model.Transaction;
 import it.coderit.banktestapp.model.CenterType;
 
@@ -98,13 +100,33 @@ public class TransactionService {
     @Transactional // Garantisce che l'intera operazione sia atomica (o tutto, o niente)
     public void downloadAndSave(String accountId, String from, String to) {
         log.info("Inizio scaricamento e memorizzazione movimenti per accountId: {} da {} a {}.", accountId, from, to);
+         
+        // LOGICA DA FILE 
+        if (loadFromFile) {
+            log.info("Caricamento movimenti da file di test: {}", testDataFilenames);
+            if (testDataFilenames == null || testDataFilenames.isEmpty()) {
+                log.warn("Nessun file di test specificato per il caricamento dei movimenti.");
+                return; // Esce se non ci sono file da caricare
+            }
+            for (String filename : testDataFilenames) {
+                try {
+                    loadFromFile(filename, accountId);
+                } catch (IOException e) {
+                    log.error("Errore durante il caricamento del file {}: {}", filename, e.getMessage());
+                }        
+            }
+            log.info("caricamento da file completato.");
+            return; // Esce dopo il caricamento da file
+        }
 
+        // LOGICA DA API
         int offset = 0; // Offset per la paginazione dell'API Credem
         int limit = 100; // Limite di transazioni per singola richiesta API
         boolean hasMore = true; // Flag per controllare se ci sono altre pagine da scaricare
 
         String token = mockCbiAuthService.getAccessToken(); // Ottengo il token Bearer mockato (o reale)
-
+        String xRequestId = "req-" + java.util.UUID.randomUUID().toString(); // ID di richiesta mockato (può essere generato dinamicamente se necessario)
+        String dateHeader = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.RFC_1123_DATE_TIME); // Data corrente in formato ISO (es. "2024-06-23")
         // Ciclo per gestire la paginazione delle risposte dall'API Credem
         while (hasMore) {
             log.info("Scaricamento pagina con offset: {}", offset);
@@ -117,7 +139,17 @@ public class TransactionService {
                     limit,     // Limite per pagina
                     offset,    // Offset corrente
                     psuId,     // ID utente del servizio di pagamento
-                    token);    // Token di autenticazione
+                    token,
+                    xRequestId,
+                    mockConsentId, // ID del consenso mockato (se necessario, altrimenti può essere rimosso se non richiesto dall'API)
+                    dateHeader,
+                    "mock-digest",
+                    "mock-signature", // Questi ultimi due parametri sono opzionali e possono essere personalizzati
+                    "mock-tpp-cert",
+                    "mock-psu-auth",
+                    "127.0.0.1",
+                    "mock-aspsp-id"                   
+                    );    // Token di autenticazione
 
             // Controlla se la risposta contiene movimenti e li salva
             if (response != null && response.booked != null && !response.booked.isEmpty()) {
@@ -368,6 +400,9 @@ public class TransactionService {
                 withBalance,
                 psuId,
                 token
+                xRequestId,
+                dateHeader,
+                mockConsentId
             );
 
             if (response != null && response.account != null) {
@@ -381,6 +416,72 @@ public class TransactionService {
             return response;
         } catch (Exeption e) {
             log.error("Errore durante il recupero dei dettagli dell'account {}: {}", accountId, e.getMessage());
+            return null;
+        }
+    }
+
+    public CredemBalancesResponse getAccountBalances(String accountId) {
+        log.info("Tentativo di recuperare i saldi per l'account: {}", accountId);
+        try {
+            String token = mockCbiAuthService.getAccessToken();
+            String xRequestId = "req-" + java.util.UUID.randomUUID().toString(); // Genera un ID di richiesta unico
+            String dateHeader = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.RFC_1123_DATE_TIME); // Formato RFC 1123 per l'header Date
+
+            // Chiamata al REST Client per ottenere i saldi di un singolo conto
+            CredemBalancesResponse response = credemClient.getBalances(
+                accountId,
+                mockConsentId,
+                psuId,
+                token,
+                xRequestId,
+                dateHeader
+            );
+
+            if (response != null && response.balances != null && !response.balances.isEmpty()) {
+                log.info("Saldi recuperati per l'account: {}", accountId);
+                response.balances.forEach(balance -> {
+                    log.info("Saldo: {} {}, Tipo: {}, Data Ultimo Aggiornamento: {}",
+                        balance.amount, balance.currency, balance.balanceType, balance.lastChangeDateTime);
+                });
+            } else {
+                log.warn("Nessun saldo trovato per l'account: {} o risposta malformata", accountId);
+            }
+            return response;
+        } catch (Exception e) {
+            log.error("Errore durante il recupero dei saldi dell'account {}: {}", accountId, e.getMessage());
+            return null;
+        }
+    }
+
+    public CredemBalacesResponse getBalancesForSpecificAccount(String accountId) {
+        log.info("Tentativo di recuperare i saldi per l'account: {}", accountId);
+        try {
+            String token = mockCbiAuthService.getAccessToken();
+            String xRequestId = "req-" + java.util.UUID.randomUUID().toString(); // Genera un ID di richiesta unico
+            String dateHeader = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.RFC_1123_DATE_TIME); // Formato RFC 1123 per l'header Date
+
+            // Chiamata al REST Client per ottenere i saldi di un singolo conto
+            CredemBalancesResponse response = credemClient.getBalances(
+                accountId,
+                mockConsentId,
+                psuId,
+                token,
+                xRequestId,
+                dateHeader
+            );
+
+            if (response != null && response.balances != null && !response.balances.isEmpty()) {
+                log.info("Saldi recuperati per l'account: {}", accountId);
+                response.balances.forEach(balance -> {
+                    log.info("Saldo: {} {}, Tipo: {}, Data Ultimo Aggiornamento: {}",
+                        balance.amount, balance.currency, balance.balanceType, balance.lastChangeDateTime);
+                });
+            } else {
+                log.warn("Nessun saldo trovato per l'account: {} o risposta malformata", accountId);
+            }
+            return response;
+        } catch (Exception e) {
+            log.error("Errore durante il recupero dei saldi dell'account {}: {}", accountId, e.getMessage());
             return null;
         }
     }

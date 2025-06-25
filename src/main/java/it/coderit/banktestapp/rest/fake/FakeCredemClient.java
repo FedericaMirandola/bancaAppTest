@@ -10,6 +10,7 @@ import io.quarkus.arc.properties.IfBuildProperty;
 import it.coderit.banktestapp.dto.CredemAccountResponse;
 import it.coderit.banktestapp.dto.CredemTransactionResponse;
 import it.coderit.banktestapp.dto.CredemSingleAccountResponse;
+import it.coderit.banktestapp.dto.CredemBalancesResponse;
 import it.coderit.banktestapp.rest.CredemClient;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -109,5 +110,39 @@ public class FakeCredemClient implements CredemClient {
             return new CredemSingleAccountResponse();
         }
     }
+
+    @Override
+    public CredemBalancesResponse getAccountBalances (
+            String accountId,
+            String consentId,
+            String psuId,
+            String token,
+            String xRequestId,
+            String dateHeader) {
+
+        String resourcePath = "test-data/account_balances_" + accountId + ".json";
+
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath) 
+            if (inputStream == null) {
+                System.err.println("File mock balances non trovato: " + resourcePath);
+                resourcePath = "test-data/account_balances_generic.json"; // fallback
+                inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath); // vuota
+            }
+        try (inputStream) {    
+            if (inputStream == null) {
+                System.err.println("File mock balances generico non trovato: " + resourcePath);
+                return new CredemBalancesResponse(); // vuota
+            }
+
+            CredemBalancesResponse response = objectMapper.readValue(inputStream, CredemBalancesResponse.class);
+            System.out.println("Saldi account caricati da " + resourcePath + ": " + (response.balances != null ? response.balances.size() : 0));
+            return response;
+
+        } catch (Exception e) {
+            System.err.println("Errore lettura/parsing JSON balances: " + e.getMessage());
+            return new CredemBalancesResponse();
+        }
+    }
+    
     
 }

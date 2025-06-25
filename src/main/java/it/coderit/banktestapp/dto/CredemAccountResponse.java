@@ -17,15 +17,25 @@ public class CredemAccountResponse {
     public static class AccountData {
         
         public String resourceId;
-        
         public String iban;
-        
         public String currency;
-        
+        public String bban;
+        public String pan;
+        public String maskedPan;
+        public String msisdn;
+        public String name;
         public String product;
-        
-        public AccountBalance balance; //valorizzato se richiesto e se l'API o il mock
-                                       // lo fornirà'
+        public String cashAccountType;
+        public String bic;
+        public String linkedAccounts;
+        public String usage;
+        public String details;
+
+        public List<AccountBalance> balances; // Lista di saldi associati all'account
+        public Map<String, LinkData> _links;
+        public ErrorMenagement errorManagement;
+        public List<TppMessage> tppMessages;
+
         
     }
 
@@ -34,6 +44,27 @@ public class CredemAccountResponse {
         public String currency; 
         public String balanceType;
         public OffseeDateTime lastChangeDateTime; 
+        public String referenceDate;
+        public String lastCommittedTransactionEntry;
 
     }
+
+    public static class LinkData {
+        public String href;
+    }
+
+    public static class ErrorMenagement {
+        public String errorCode;
+        public String errorDescription;
+        
+    }
+
+    public static class TppMessage {
+        public String category; //ERROR-WARNING
+        public String code;
+        public String path;
+        public String text;
+       
+    }
+
 }

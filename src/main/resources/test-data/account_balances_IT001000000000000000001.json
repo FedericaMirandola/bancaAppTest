@@ -1,0 +1,42 @@
+{
+    "account": 
+        {
+        "iban": "IT00A01234567890123456789012",
+        "currency": "EUR"
+        },
+    "balances": [
+        {       
+        "amount": 500.50,
+        "currency": "EUR",
+        "lastUpdated": "2025-06-25T12:00:00Z",
+        "referenceDate": "2025-06-25",
+        "lastChangeDateTime": null
+        },
+        {
+        "amount": 12345.67,
+        "currency": "EUR",
+        "balanceType": "closingBooked",
+        "lastChangeDateTime":  "2025-06-25T14:30:00Z",
+        "referenceDate": "2025-06-25",
+        "lastCommittedTransactionEntry": "TXN_COMMITTED_123"
+        },
+        {
+        "amount": 1000.00,
+        "currency": "EUR",
+        "balanceType": "expected",
+        "lastChangeDateTime": "2025-06-25T14:30:00Z",  
+        "referenceDate": "2025-06-25",
+        "lastCommittedTransactionEntry": null
+        },
+        {
+        "amount": 200.00,
+        "currency": "EUR",
+        "balanceType": "available",
+        "lastChangeDateTime": "2025-06-25T14:30:00Z",
+        "referenceDate": "2025-06-25",
+        "lastCommittedTransactionEntry": null
+
+        }
+    ]
+    
+}

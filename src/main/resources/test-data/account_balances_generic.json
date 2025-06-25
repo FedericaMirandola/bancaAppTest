@@ -1,0 +1,17 @@
+{
+    "account": {
+        "iban": "IT00X000000000000000000000",
+        "currency": "EUR"
+    },
+    "balances": [
+        {
+            "amount": 5000.00,
+            "currency": "EUR",
+            "balanceType": "closingBooked",
+            "lastUpdated": "2025-06-25T12:00:00Z",
+            "referenceDate": "2025-06-25",
+            "lastChangeDateTime": "GENERIC_TXN_REF"
+        }
+    ]
+
+}
