@@ -1,0 +1,10 @@
+{
+    "accounts": {
+        "resourceId": "IT001000000000000000001",
+        "iban": "IT00A01234567890123456789012",
+        "currency": "EUR",
+        "product": "Conto Corrente Buisness",
+        "name": "CODERIT S.r.l",
+        "CashAccountType": "CACC"
+    }
+}

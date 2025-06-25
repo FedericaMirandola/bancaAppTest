@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.arc.properties.IfBuildProperty;
 import it.coderit.banktestapp.dto.CredemAccountResponse;
 import it.coderit.banktestapp.dto.CredemTransactionResponse;
+import it.coderit.banktestapp.dto.CredemSingleAccountResponse;
 import it.coderit.banktestapp.rest.CredemClient;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -69,4 +70,44 @@ public class FakeCredemClient implements CredemClient {
             return new CredemAccountResponse(); 
         }
     }
+
+    @Override
+    public CredemSingleAccountResponse getAccountDetails(
+            String accountId,
+            String consentId,
+            Boolean withBalance,
+            String psuId,
+            String token) {
+
+        String resourcePath;
+
+        if (Boolean.TRUE.equals(withBalance)) {
+            resourcePath = "test-data/account_details_with_balance" + accountId + ".json";
+        } else {
+            resourcePath = "test-data/account_details_with_no_balance" + accountId + ".json";
+        }
+
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath);
+        if (inputStream == null) {
+            System.err.println("File mock account details non trovato: " + resourcePath + ". Tentativo con file generico"); );
+            resourcePath = "test-data/account_details_generic.jason"; // fallback
+            inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath);
+        }
+
+        try (inputStream) {
+            if (inputStream == null) {
+                System.err.println("File mock account details generico non trovato: " + resourcePath);
+                return new CredemSingleAccountResponse(); // vuota
+            }
+
+            CredemSingleAccountResponse response = objectMapper.readValue(inputStream, CredemSingleAccountResponse.class);
+            System.out.println("Dettagli account caricati da " + resourcePath + ": " + response.account.resourceId);
+            return response;
+
+        } catch (Exception e) {
+            System.err.println("Errore lettura/parsing JSON account details: " + e.getMessage());
+            return new CredemSingleAccountResponse();
+        }
+    }
+    
 }

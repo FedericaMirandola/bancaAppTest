@@ -82,6 +82,9 @@ public class TransactionService {
     @ConfigProperty(name = "credem.default-account-id")
     String defaultAccountIdForOperations;
 
+    @ConfigProperty(name = "cbi-consent-mock-id")
+    String mockConsentId;
+
     // --- Metodi di Business Logic ---
 
     /**
@@ -351,6 +354,34 @@ public class TransactionService {
             // 4. Errore nella chiamata, usa il default configurato come fallback
             log.error("Errore durante il recupero dinamico degli account da CredemClient. Utilizzo l'accountId predefinito di fallback: {}. Errore: {}", defaultAccountIdForOperations, e.getMessage());
             return defaultAccountIdForOperations;
+        }
+    }
+
+    public CredemSingleAccountResponse getSpecificAccountDetails(String accountId, Boolean withBalance){
+        log.info("Tentativo di recuperare i dettagli per l'account: {} con saldo: {}", accountId, withBalance);
+        try{
+            String token = mockCbiAuthService.getAccessToken();
+
+            //chiamata al REST Client per ottenere i dettagli di un singolo conto
+            CredemSingleAccountResponse response = credemClient.getAccountDetails (
+                accountId,
+                withBalance,
+                psuId,
+                token
+            );
+
+            if (response != null && response.account != null) {
+                log.info("Dettagli account recuperati per: {}. IBAN: {}", accountId, response.account.iban);
+                if (response.account.balance != null) {
+                    log.info("Saldo disponibile: {} {}", response.account.balance.amount, response.account.balance.currency);
+                }
+            } else {
+                log.warn("Nessun dettaglio account trovato per: {} o risposta malformata", accountId);
+            }
+            return response;
+        } catch (Exeption e) {
+            log.error("Errore durante il recupero dei dettagli dell'account {}: {}", accountId, e.getMessage());
+            return null;
         }
     }
 }

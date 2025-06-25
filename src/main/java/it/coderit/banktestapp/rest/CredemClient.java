@@ -6,6 +6,8 @@ import it.coderit.banktestapp.dto.CredemAccountResponse;
 import it.coderit.banktestapp.dto.CredemTransactionResponse;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.*;
+import jakarta.ws.res.PathParam;
+import jakarta.ws.rs.QueryParam;
 
 
 @Path("/accounts")
@@ -28,8 +30,17 @@ public interface CredemClient {
     );
 
     @GET
-    @Path("/accounts")
     CredemAccountResponse getAccounts (
+        @HeaderParam("psu-id") String psuId,
+        @HeaderParam("Authorization") String token
+    );
+
+    @GET
+    @Path("/{accountId}")
+    CredemAccountResponse getSingleAccount(
+        @PathParam("account-id") String accountId,
+        @HeaderParam("Consent-id") String consentId,
+        @QuesryParam("with-balance") Boolean withBalance,
         @HeaderParam("psu-id") String psuId,
         @HeaderParam("Authorization") String token
     );
