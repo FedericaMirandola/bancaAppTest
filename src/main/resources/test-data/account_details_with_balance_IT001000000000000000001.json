@@ -1,16 +1,34 @@
 {
-    "account": {
-        "resourceId": "IT001000000000000000001",
-        "iban": "IT00A01234567890123456789012",
+  "account": {
+    "resourceId": "IT001000000000000000001",
+    "iban": "IT00A01234567890123456789012",
+    "currency": "EUR",
+    "bban": null,                     
+    "pan": null,                      
+    "maskedPan": null,                
+    "msisdn": null,                   
+    "name": "CODERIT S.r.l.",
+    "product": "Conto Corrente Business", 
+    "cashAccountType": "CACC",     
+    "bic": null,                     
+    "linkedAccounts": null,           
+    "usage": "CORP",                  
+    "details": "Conto aziendale principale per operazioni correnti, con saldo.", 
+    
+    "balances": [ 
+      {
+        "amount": 12345.67,
         "currency": "EUR",
-        "pruduct": "Conto Corrente Business",
-        "name": "CODERIT S.r.l",
-        "CashAccountType": "CACC",
-        "balance": {
-            "amount": 12345.67,
-            "currency": "EUR",
-            "balanceType": "closingBooked",
-            "lastChangeDateTime": "2025-06-25T14:30:00Z"
-        }
-    }
+        "balanceType": "closingBooked",
+        "lastChangeDateTime": "2025-06-25T14:30:00Z",
+        "referenceDate": "2025-06-25", 
+        "lastCommittedTransactionEntry": "TXN_ABCDEF" 
+      }
+      
+    ],
+    
+    "_links": {},                     
+    "errorManagement": null,          
+    "tppMessages": []                
+  }
 }

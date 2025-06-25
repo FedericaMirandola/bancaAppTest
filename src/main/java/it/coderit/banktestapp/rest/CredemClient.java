@@ -22,6 +22,17 @@ public interface CredemClient {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     CredemTransactionResponse getTransactions(
+        @HeadParam("PSU-ID") String psuId,
+        @HeaderParam("Authorization") String token,
+        @HeaderParam("X-Request-ID") String xRequestId,
+        @HeaderParam("Consent-ID") String consentId,
+        @HeaderParam("Date") String dateHeader,
+        @HeaderParam("Digest") String digest,
+        @HeaderParam("Signature") String signature,
+        @HeaderParam("TPP-Signature-Certificate") String tppSignatureCertificate,
+        @HeaderParam("PSU-Authorization") String psuAuthorization,
+        @HeaderParam("PSU-IP-Address") String psuIpAddress,
+        @HeaderParam("ASPSP-Code") String aspspCode,
         @PathParam("accountId") String accountId,
         @QueryParam("dateFrom") String dateFrom,
         @QueryParam("dateTo") String dateTo,
@@ -34,17 +45,22 @@ public interface CredemClient {
     @GET
     CredemAccountResponse getAccounts (
         @HeaderParam("psu-id") String psuId,
-        @HeaderParam("Authorization") String token
+        @HeaderParam("Authorization") String token,
+        @HeaderParam("Consent-id") String consentId,
+        @HeaderParam("X-Request-ID") String xRequestId,
+        @HeaderParam("Date") String dateHeader
     );
 
     @GET
     @Path("/{accountId}")
-    CredemAccountResponse getSingleAccount(
-        @PathParam("account-id") String accountId,
-        @HeaderParam("Consent-id") String consentId,
-        @QuesryParam("with-balance") Boolean withBalance,
-        @HeaderParam("psu-id") String psuId,
-        @HeaderParam("Authorization") String token
+    CredemAccountResponse getAccountDetails(
+        @PathParam("accountId") String accountId,
+        @HeaderParam("Consent-ID") String consentId,
+        @HeaderParam("PSU-ID") String psuId,
+        @HeaderParam("Authorization") String token,
+        @HeaderParam("X-Request-ID") String xRequestId,
+        @HeaderParam("Date") String dateHeader,
+        @QueryParam("withBalance") Boolean withBalance
     );
 
     @GET

@@ -2,7 +2,8 @@ package it.coderit.banktestapp.dto;
 
 import java.util.List;
 import java.math.BigDecimal;
-import java.time.OffseeDateTime; 
+import java.time.OffsetDateTime; 
+import java.util.Map;
 
 
 
@@ -33,7 +34,7 @@ public class CredemAccountResponse {
 
         public List<AccountBalance> balances; // Lista di saldi associati all'account
         public Map<String, LinkData> _links;
-        public ErrorMenagement errorManagement;
+        public ErrorManagement errorManagement;
         public List<TppMessage> tppMessages;
 
         
@@ -43,7 +44,7 @@ public class CredemAccountResponse {
         public BigDecimal amount; 
         public String currency; 
         public String balanceType;
-        public OffseeDateTime lastChangeDateTime; 
+        public OffsetDateTime lastChangeDateTime; 
         public String referenceDate;
         public String lastCommittedTransactionEntry;
 
@@ -53,7 +54,7 @@ public class CredemAccountResponse {
         public String href;
     }
 
-    public static class ErrorMenagement {
+    public static class ErrorManagement {
         public String errorCode;
         public String errorDescription;
         

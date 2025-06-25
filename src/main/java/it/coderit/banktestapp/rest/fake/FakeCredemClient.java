@@ -53,7 +53,7 @@ public class FakeCredemClient implements CredemClient {
     }
 
     @Override
-    public CredemAccountResponse getAccounts(String psuId, String token) {
+    public CredemAccountResponse getAccounts(String psuId, String token, String consentId, String xRequestId, String dateHeader) {
         String resourcePath = "test-data/accounts.json"; 
 
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
@@ -76,9 +76,12 @@ public class FakeCredemClient implements CredemClient {
     public CredemSingleAccountResponse getAccountDetails(
             String accountId,
             String consentId,
-            Boolean withBalance,
             String psuId,
-            String token) {
+            String token,
+            String xRequestId,
+            String dateHeader,
+            Boolean withBalance
+    ) {
 
         String resourcePath;
 

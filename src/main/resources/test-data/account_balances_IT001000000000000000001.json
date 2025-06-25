@@ -5,13 +5,7 @@
         "currency": "EUR"
         },
     "balances": [
-        {       
-        "amount": 500.50,
-        "currency": "EUR",
-        "lastUpdated": "2025-06-25T12:00:00Z",
-        "referenceDate": "2025-06-25",
-        "lastChangeDateTime": null
-        },
+       
         {
         "amount": 12345.67,
         "currency": "EUR",

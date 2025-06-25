@@ -33,12 +33,12 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
-// Import necessari per le query Panache dinamiche
+
 import io.quarkus.panache.common.Parameters;
 
 /**
  * Servizio per la gestione dei movimenti bancari, inclusi scaricamento,
- * salvataggio, classificazione e recupero filtrato.
+ * salvataggio, classificazione e recupero filtrato e getione flow autenticazione
  */
 @ApplicationScoped
 public class TransactionService {
@@ -133,23 +133,23 @@ public class TransactionService {
 
             // Effettua la chiamata al client REST per ottenere le transazioni
             CredemTransactionResponse response = credemClient.getTransactions(
-                    accountId, // Account ID richiesto dall'API
-                    from,      // Data di inizio
-                    to,        // Data di fine
-                    limit,     // Limite per pagina
-                    offset,    // Offset corrente
-                    psuId,     // ID utente del servizio di pagamento
-                    token,
-                    xRequestId,
-                    mockConsentId, // ID del consenso mockato (se necessario, altrimenti può essere rimosso se non richiesto dall'API)
+                    psuId, 
+                    token,     
+                    xRequestId,      
+                    mockConsentId,    
                     dateHeader,
-                    "mock-digest",
-                    "mock-signature", // Questi ultimi due parametri sono opzionali e possono essere personalizzati
-                    "mock-tpp-cert",
-                    "mock-psu-auth",
-                    "127.0.0.1",
-                    "mock-aspsp-id"                   
-                    );    // Token di autenticazione
+                    "mock-digest", //valore mock
+                    "mock-signature", //valore mock
+                    "mock-tpp-cert", //valore mock
+                    "mock-psu-auth", //valore mock
+                    "127.0.0.1", //Valore mock
+                    "mock-aspsp-id", 
+                    accountId,
+                    from,
+                    to,
+                    limit,
+                    offset                
+                    );    
 
             // Controlla se la risposta contiene movimenti e li salva
             if (response != null && response.booked != null && !response.booked.isEmpty()) {
@@ -164,13 +164,7 @@ public class TransactionService {
         log.info("Scaricamento movimenti completato da {} a {}.", from, to);
     }
 
-    /**
-     * Salva una lista di DTO di transazioni nel database come Transaction.
-     * Applica le rules di classificazione ed evita duplicati basandosi sull'ID transazione.
-     *
-     * @param dtoList           La lista di DTO CredemTransactionResponse.TransactionData.
-     * @param defaultAccountId  L'ID del conto da usare se il DTO non lo specifica.
-     */
+
     @Transactional
     public void saveTransactionsFromDTOList(List<TransactionData> dtoList, String defaultAccountId) {
         log.info("Inizio salvataggio movimenti da lista. Transazioni da processare: {}", (dtoList != null ? dtoList.size() : 0));
@@ -238,18 +232,7 @@ public class TransactionService {
         return transaction;
     }
 
-    /**
-     * **NUOVO METODO UNIFICATO PER IL FILTRO**
-     * Recupera una lista di movimenti dal database applicando filtri dinamici.
-     * Supporta filtro per accountId, range di date e tipo di center di costo/profitto.
-     * Tutti i parametri di filtro, tranne accountId, sono opzionali.
-     *
-     * @param accountId L'ID del conto (obbligatorio a livello di controller, ma passato qui).
-     * @param fromDate  Data di inizio del range (opzionale).
-     * @param toDate    Data di fine del range (opzionale).
-     * @param centerType Tipo di center (COSTO/PROFITTO) (opzionale).
-     * @return Una lista di Transaction che soddisfano i criteri di filtro.
-     */
+
     public List<Transaction> searchTransactions(
             String accountId,
             LocalDate fromDate, // LocalDate dal controller
@@ -290,36 +273,6 @@ public class TransactionService {
         // una stringa di query e un oggetto Parameters.
         return transactionRepo.find(queryBuilder.toString(), parameters).list();
     }
-
-    // --- Vecchi Metodi di Query (Commentati - possono essere rimossi) ---
-
-    /*
-     * Questo metodo è ora inglobato da searchTransactions.
-     * Non più chiamato direttamente dal controller unificato.
-     *
-    @Transactional
-    public List<Transaction> leggiMovimentiPerAccountIdEData(String accountId, String from, String to) {
-        if (from == null || to == null) {
-            log.warn("Parametri di data 'from' o 'to' nulli in leggiMovimentiPerAccountIdEData.");
-            return List.of();
-        }
-
-        OffsetDateTime fromDate = LocalDate.parse(from).atStartOfDay().atOffset(ZoneOffset.UTC);
-        OffsetDateTime toDate = LocalDate.parse(to).atTime(23, 59, 59).atOffset(ZoneOffset.UTC);
-
-        // Delega al repository per filtrare anche per accountId
-        return transactionRepo.findByAccountIdAndDateRange(accountId, fromDate, toDate);
-    }
-    */
-
-    /*
-     * Questo metodo è ora inglobato da searchTransactions.
-     * Non più chiamato direttamente dal controller unificato.
-     *
-    public List<Transaction> leggiMovimentiPerCenterType(CenterType centerType) {
-        return transactionRepo.findByCentroTipo(centerType);
-    }
-    */
 
     // --- Metodo di Importazione da File (lasciato invariato, non chiamato dal controller) ---
 

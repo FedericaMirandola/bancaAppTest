@@ -5,7 +5,7 @@
       "bookingDate": "2025-05-22T10:00:00+02:00",
       "valueDate": "2025-05-22T10:00:00+02:00",
       "transactionAmount": {
-        "amount": "10.50",
+        "amount": 10.50,   
         "currency": "EUR"
       },
       "remittanceInformationUnstructured": "Supermarket purchase",
@@ -13,14 +13,15 @@
       "debtorName": "You",
       "bankTransactionCode": "1234",
       "proprietaryBankTransactionCode": "CBI-00001",
-      "accountId": "3"
+      "additionalInformation": null, 
+      "accountId": "IT001000000000000000001" 
     },
     {
       "transactionId": "TXN-456",
       "bookingDate": "2025-05-21T15:30:00+02:00",
       "valueDate": "2025-05-21T15:30:00+02:00",
       "transactionAmount": {
-        "amount": "-25.00",
+        "amount": -25.00,  
         "currency": "EUR"
       },
       "remittanceInformationUnstructured": "Online payment - ABC",
@@ -28,7 +29,8 @@
       "debtorName": "You",
       "bankTransactionCode": "5678",
       "proprietaryBankTransactionCode": "CBI-00002",
-      "accountId": "3"
+      "additionalInformation": null, 
+      "accountId": "IT001000000000000000001" 
     }
   ]
 }

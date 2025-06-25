@@ -5,7 +5,7 @@
       "bookingDate": "2025-06-10T12:26:45+02:00",
       "valueDate": "2025-06-10T12:26:45+02:00",
       "transactionAmount": {
-        "amount": "-12.99",
+        "amount": -12.99, 
         "currency": "EUR"
       },
       "remittanceInformationUnstructured": "Restaurant dinner",
@@ -13,14 +13,15 @@
       "debtorName": "You",
       "bankTransactionCode": "1111",
       "proprietaryBankTransactionCode": "CBI-00003",
-      "accountId": "3"
+      "additionalInformation": null, 
+      "accountId": "IT001000000000000000001" 
     },
     {
       "transactionId": "TXN-790",
       "bookingDate": "2025-06-08T12:26:45+02:00",
       "valueDate": "2025-06-08T12:26:45+02:00",
       "transactionAmount": {
-        "amount": "-60.00",
+        "amount": -60.00, 
         "currency": "EUR"
       },
       "remittanceInformationUnstructured": "Electricity bill",
@@ -28,14 +29,15 @@
       "debtorName": "You",
       "bankTransactionCode": "1112",
       "proprietaryBankTransactionCode": "CBI-00004",
-      "accountId": "3"
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001" 
     },
     {
       "transactionId": "TXN-791",
       "bookingDate": "2025-06-06T12:26:45+02:00",
       "valueDate": "2025-06-06T12:26:45+02:00",
       "transactionAmount": {
-        "amount": "-19.90",
+        "amount": -19.90, 
         "currency": "EUR"
       },
       "remittanceInformationUnstructured": "Software license renewal",
@@ -43,14 +45,15 @@
       "debtorName": "You",
       "bankTransactionCode": "1113",
       "proprietaryBankTransactionCode": "CBI-00005",
-      "accountId": "3"
+      "additionalInformation": null, 
+      "accountId": "IT001000000000000000001" 
     },
     {
       "transactionId": "TXN-792",
       "bookingDate": "2025-06-11T12:26:45+02:00",
       "valueDate": "2025-06-11T12:26:45+02:00",
       "transactionAmount": {
-        "amount": "1500.00",
+        "amount": 1500.00, 
         "currency": "EUR"
       },
       "remittanceInformationUnstructured": "Client payment invoice 102",
@@ -58,14 +61,15 @@
       "debtorName": "You",
       "bankTransactionCode": "2222",
       "proprietaryBankTransactionCode": "CBI-00006",
-      "accountId": "3"
+      "additionalInformation": null, 
+      "accountId": "IT001000000000000000001"
     },
     {
       "transactionId": "TXN-793",
       "bookingDate": "2025-06-07T12:26:45+02:00",
       "valueDate": "2025-06-07T12:26:45+02:00",
       "transactionAmount": {
-        "amount": "300.00",
+        "amount": 300.00, 
         "currency": "EUR"
       },
       "remittanceInformationUnstructured": "Consulting fee - June",
@@ -73,7 +77,8 @@
       "debtorName": "You",
       "bankTransactionCode": "2223",
       "proprietaryBankTransactionCode": "CBI-00007",
-      "accountId": "3"
+      "additionalInformation": null, 
+      "accountId": "IT001000000000000000001" 
     }
   ]
 }
