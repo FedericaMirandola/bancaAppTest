@@ -24,13 +24,23 @@ public class FakeCredemClient implements CredemClient {
 
     @Override
     public CredemTransactionResponse getTransactions(
+            String psuId,
+            String token,
+            String xRequestId,
+            String consentId,
+            String dateHeader,
+            String digest,
+            String signature,
+            String tppSignatureCertificate,
+            String psuAuthorization,
+            String psuIpAddress,
+            String aspspCode,
             String accountId,
             String dateFrom,
             String dateTo,
             Integer limit,
-            Integer offset,
-            String psuId,
-            String token) {
+            Integer offset
+            ) {
 
         String resourcePath = (offset == null || offset == 0)
                 ? "test-data/transaction_page_1.json"
@@ -91,13 +101,14 @@ public class FakeCredemClient implements CredemClient {
             resourcePath = "test-data/account_details_with_no_balance" + accountId + ".json";
         }
 
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath);
-        if (inputStream == null) {
-            System.err.println("File mock account details non trovato: " + resourcePath + ". Tentativo con file generico"); );
-            resourcePath = "test-data/account_details_generic.jason"; // fallback
-            inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath);
+        InputStream tmpInputStream = getClass().getClassLoader().getResourceAsStream(resourcePath);
+        if (tmpInputStream == null) {
+            System.err.println("File mock account details non trovato: " + resourcePath + ". Tentativo con file generico");
+            resourcePath = "test-data/account_details_generic.json"; // fallback
+            tmpInputStream = getClass().getClassLoader().getResourceAsStream(resourcePath);
         }
 
+        final InputStream inputStream = tmpInputStream;
         try (inputStream) {
             if (inputStream == null) {
                 System.err.println("File mock account details generico non trovato: " + resourcePath);
@@ -125,12 +136,14 @@ public class FakeCredemClient implements CredemClient {
 
         String resourcePath = "test-data/account_balances_" + accountId + ".json";
 
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath) 
-            if (inputStream == null) {
-                System.err.println("File mock balances non trovato: " + resourcePath);
-                resourcePath = "test-data/account_balances_generic.json"; // fallback
-                inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath); // vuota
-            }
+        InputStream tmpInputStream = getClass().getClassLoader().getResourceAsStream(resourcePath);
+        if (tmpInputStream == null) {
+            System.err.println("File mock balances specifico non trovato: " + resourcePath);
+            resourcePath = "test-data/account_balances_generic.json"; // fallback
+            tmpInputStream = getClass().getClassLoader().getResourceAsStream(resourcePath); 
+        } 
+        
+        final InputStream inputStream = tmpInputStream;
         try (inputStream) {    
             if (inputStream == null) {
                 System.err.println("File mock balances generico non trovato: " + resourcePath);

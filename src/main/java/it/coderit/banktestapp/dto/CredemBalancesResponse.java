@@ -1,7 +1,8 @@
 package it.coderit.banktestapp.dto;
 
-import it.coderit.banktestapp.dto.CredemAccountResponse.BalanceData;
-import it.coderit.banktestapp.dto.CredemAccountResponse.ErrorMenagement;
+import it.coderit.banktestapp.dto.CredemAccountResponse.AccountBalance;
+import it.coderit.banktestapp.dto.CredemAccountResponse.AccountBalance;
+import it.coderit.banktestapp.dto.CredemAccountResponse.ErrorManagement;
 import it.coderit.banktestapp.dto.CredemAccountResponse.TppMessage;
 
 import java.util.List;
@@ -10,9 +11,9 @@ public class CredemBalancesResponse {
 
     public BalancesAccountInfo account;
 
-    public List<BalanceData> balances;
+    public List<AccountBalance> balances;
 
-    public ErrorMenagement errorManagement;
+    public ErrorManagement errorManagement;
     public List<TppMessage> tppMessages;
 
     public static class BalancesAccountInfo {

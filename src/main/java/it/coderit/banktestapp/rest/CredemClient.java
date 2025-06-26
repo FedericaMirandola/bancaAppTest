@@ -8,7 +8,7 @@ import it.coderit.banktestapp.dto.CredemBalancesResponse;
 import it.coderit.banktestapp.dto.CredemSingleAccountResponse;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.*;
-import jakarta.ws.res.PathParam;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.QueryParam;
 
 
@@ -19,10 +19,8 @@ public interface CredemClient {
     
     @GET
     @Path("/{accountId}/transactions")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     CredemTransactionResponse getTransactions(
-        @HeadParam("PSU-ID") String psuId,
+        @HeaderParam("PSU-ID") String psuId,
         @HeaderParam("Authorization") String token,
         @HeaderParam("X-Request-ID") String xRequestId,
         @HeaderParam("Consent-ID") String consentId,
@@ -37,9 +35,8 @@ public interface CredemClient {
         @QueryParam("dateFrom") String dateFrom,
         @QueryParam("dateTo") String dateTo,
         @QueryParam("limit") Integer limit,     
-        @QueryParam("offset") Integer offset,
-        @HeaderParam("psu-id") String psuId,
-        @HeaderParam("Authorization") String token 
+        @QueryParam("offset") Integer offset
+        
     );
 
     @GET
@@ -53,7 +50,7 @@ public interface CredemClient {
 
     @GET
     @Path("/{accountId}")
-    CredemAccountResponse getAccountDetails(
+    CredemSingleAccountResponse getAccountDetails(
         @PathParam("accountId") String accountId,
         @HeaderParam("Consent-ID") String consentId,
         @HeaderParam("PSU-ID") String psuId,
@@ -65,7 +62,7 @@ public interface CredemClient {
 
     @GET
     @Path("/{accountId}/balances")
-    CredemBalancesResponse getBalances(
+    CredemBalancesResponse getAccountBalances(
         @PathParam("account-id") String accountId,
         @HeaderParam("Consent-ID") String consentId,
         @HeaderParam("PSU-ID") String psuId,
