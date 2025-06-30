@@ -23,14 +23,14 @@ import java.util.List;
 
 import io.restassured.http.ContentType;
 
-import groovy.xml.Entity;
+// import groovy.xml.Entity; // Non usato, può essere rimosso
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import it.coderit.banktestapp.dto.RuleInput;
 import it.coderit.banktestapp.model.ClassificationRule;
 import it.coderit.banktestapp.model.CenterType;
 import it.coderit.banktestapp.repository.ClassificationRuleRepository;
-import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManager; // Non usato direttamente, ma può essere mantenuto per InjectMock
 
 @QuarkusTest
 public class ClassificationRuleControllerTest {
@@ -39,7 +39,7 @@ public class ClassificationRuleControllerTest {
     ClassificationRuleRepository regolaRepository;
 
     @InjectMock
-    EntityManager entityManager;
+    EntityManager entityManager; // Mantenuto per coerenza con la tua struttura, anche se non usato direttamente nei test
 
     private ClassificationRule regola1;
     private ClassificationRule regola2;
@@ -54,6 +54,7 @@ public class ClassificationRuleControllerTest {
         regola1.setId(1L);
         regola1.setKeyword("affitto");
         regola1.setCenter(CenterType.COSTO);
+        // HO CAMBIATO QUI: "casa" in minuscolo per corrispondere all'output effettivo
         regola1.setJsonRule("{\"categoria\": \"casa\", \"sottocategoria\": \"Affitto\"}");
 
         regola2 = new ClassificationRule();
@@ -63,7 +64,7 @@ public class ClassificationRuleControllerTest {
         regola2.setJsonRule(null);
 
         when(regolaRepository.listAll()).thenReturn(List.of(regola1, regola2));
-       
+        
     }
 
     // -------- TEST per GET /rules --------
@@ -255,7 +256,7 @@ public class ClassificationRuleControllerTest {
 
         // Verifica che findById sia stato chiamato e che i setters siano stati usati sull'oggetto mockato
         verify(regolaRepository, times(1)).findById(existingId);
-       
+        
     }
 
     @Test
@@ -287,8 +288,8 @@ public class ClassificationRuleControllerTest {
 
         RuleInput partialInput = new RuleInput();
         partialInput.keyword = "solo_parola"; // Aggiorno solo la parola chiave
-        partialInput.center = null; // Lascio null per non aggiornare il center
-        partialInput.jsonRule = null; // Lascio null per non aggiornare il jsonRule
+        partialInput.center = null; 
+        partialInput.jsonRule = null; 
 
         given()
                 .contentType(ContentType.JSON)
@@ -299,8 +300,8 @@ public class ClassificationRuleControllerTest {
                     .statusCode(200)
                     .body("id", is(existingId.intValue()))
                     .body("keyword", equalTo("solo_parola"))
-                    .body("center", equalTo(CenterType.COSTO.name())) // Dovrebbe rimanere il COSTO originale
-                 .body("jsonRule", equalTo("{\"categoria\": \"Casa\", \"sottocategoria\": \"Affitto\"}")); // Dovrebbe rimanere l'originale
+                    .body("center", equalTo(CenterType.COSTO.name())) 
+                    .body("jsonRule", equalTo("{\"categoria\": \"casa\", \"sottocategoria\": \"Affitto\"}")); 
 
         verify(regolaRepository, times(1)).findById(existingId);
     }
@@ -324,13 +325,12 @@ public class ClassificationRuleControllerTest {
                     .put("/rules/{id}", existingId)
                 .then()
                     .statusCode(500)
-                 .body(containsString("Errore DB durante findById")); // Assicurati che il messaggio di errore sia quello atteso
+                    .body(containsString("Errore DB durante findById")); // Assicurati che il messaggio di errore sia quello atteso
 
         verify(regolaRepository, times(1)).findById(existingId);
     }
 
-  
-
+    
     //----------- Test per DELETE /rules/{id} -------------
 
     @Test
@@ -377,15 +377,4 @@ public class ClassificationRuleControllerTest {
 
         verify(regolaRepository, times(1)).deleteById(existingId);
     }
-
-    
-
-
-
-
-
-
-
-
-
 }

@@ -1,7 +1,3 @@
-DROP TABLE IF EXISTS transaction CASCADE;
-DROP TABLE IF EXISTS regola_classificazione CASCADE;
-DROP TABLE IF EXISTS center CASCADE;
-
 CREATE TABLE regola_classificazione (
     id BIGSERIAL PRIMARY KEY,
     parola_chiave TEXT NOT NULL,
