@@ -83,7 +83,7 @@ public class TransactionService {
     List<String> testDataFilenames;
 
     // ProprietÃ  per l'account ID predefinito/preferito/fallback
-    @ConfigProperty(name = "credem.default-account-id")
+    @ConfigProperty(name = "credem.account-id")
     String defaultAccountIdForOperations;
 
     @ConfigProperty(name = "cbi.consent-mock-id")

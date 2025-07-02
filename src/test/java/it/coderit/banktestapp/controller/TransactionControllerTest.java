@@ -6,11 +6,13 @@ import org.mockito.Mockito;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -22,6 +24,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
@@ -39,53 +42,263 @@ public class TransactionControllerTest {
     @InjectMock
     TransactionService transactionService;
 
-    @ConfigProperty(name = "credem.account-id")
-    String accountId;
+    private final String DEFAULT_TEST_ACCOUNT_ID = "IT001000000000000000001";
 
     private Transaction transactionTestCosto;
     private Transaction transactionTestProfitto;
+    private Transaction transactionTestCosto2;
 
     @BeforeEach
     public void setUp() {
         Mockito.reset(transactionService);
 
         transactionTestCosto = new Transaction();
-        transactionTestCosto.setId(1L);
-        transactionTestCosto.setAccountId("testAccountId");
+        transactionTestCosto.setTransactionId(UUID.randomUUID().toString());
+        transactionTestCosto.setAccountId(DEFAULT_TEST_ACCOUNT_ID);
         transactionTestCosto.setBookingDate(OffsetDateTime.parse("2023-10-01T10:00:00Z"));
-        transactionTestCosto.setAmount(BigDecimal.valueOf(100.0));
+        transactionTestCosto.setAmount(BigDecimal.valueOf(-50.0));
         transactionTestCosto.setRemittanceInformation("Test Transaction Costo");
         transactionTestCosto.setCenterType(CenterType.COSTO);
         transactionTestCosto.setCurrency("EUR");
 
         transactionTestProfitto = new Transaction();
-        transactionTestProfitto.setId(2L);
-        transactionTestProfitto.setAccountId("testAccountId");
+        transactionTestProfitto.setTransactionId(UUID.randomUUID().toString());
+        transactionTestProfitto.setAccountId(DEFAULT_TEST_ACCOUNT_ID);
         transactionTestProfitto.setBookingDate(OffsetDateTime.parse("2023-10-15T12:00:00Z"));
-        transactionTestProfitto.setAmount(BigDecimal.valueOf(-50.0));
+        transactionTestProfitto.setAmount(BigDecimal.valueOf(100.0));
         transactionTestProfitto.setRemittanceInformation("Test Transaction Profitto");
         transactionTestProfitto.setCenterType(CenterType.PROFITTO);
         transactionTestProfitto.setCurrency("EUR");
 
-        when(transactionService.searchTransactions(anyString(), any(LocalDate.class), any(LocalDate.class), any(CenterType.class)))
-            .thenReturn(List.of(transactionTestCosto, transactionTestProfitto));
+        transactionTestCosto2 = new Transaction();
+        transactionTestCosto2.setTransactionId(UUID.randomUUID().toString());
+        transactionTestCosto2.setAccountId(DEFAULT_TEST_ACCOUNT_ID);
+        transactionTestCosto2.setBookingDate(OffsetDateTime.parse("2023-10-15T12:00:00Z"));
+        transactionTestCosto2.setRemittanceInformation("Altro costo");
+        transactionTestCosto2.setCenterType(CenterType.COSTO);
+        transactionTestCosto2.setCurrency("EUR");
 
-        when(transactionService.searchTransactions(eq("testAccountId"), eq(null), eq(null), eq(null)))
-            .thenReturn(List.of(transactionTestCosto, transactionTestProfitto));
-
-        when(transactionService.searchTransactions(eq("testAccountId"), any(LocalDate.class), any(LocalDate.class), eq(CenterType.COSTO)))
-            .thenReturn(List.of(transactionTestCosto));
-
-        when(transactionService.searchTransactions(eq("testAccountId"), any(LocalDate.class), any(LocalDate.class), eq(CenterType.PROFITTO)))
-            .thenReturn(List.of(transactionTestProfitto));
-
-
-        doNothing().when(transactionService).downloadAndSave(anyString(), anyString(), anyString());
-        doNothing().when(transactionService).saveTransactionsFromDTOList(any(List.class), anyString());
     }
 
-    // --- Tutti i test relativi agli endpoint commentati nel controller sono ora commentati qui ---
+     // --- TEST per l'ENDPOINT GET /transactions ---
 
+
+    //deve restituire tutte le transazoni quando non sono formiti parametri
+    @Test
+    void transactions_shouldReturnTransactions_whenNoQueryParams() {
+        
+        when(transactionService.searchTransactions(eq(DEFAULT_TEST_ACCOUNT_ID), eq(null), eq(null), eq(null)))
+            .thenReturn(List.of(transactionTestCosto, transactionTestProfitto));
+
+        given()
+            .auth().basic("user", "userpassword")
+            .when()
+                .get("/transactions") 
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("size()", is(2))
+                .body("[0].remittanceInformation", is(transactionTestCosto.getRemittanceInformation()))
+                .body("[1].remittanceInformation", is(transactionTestProfitto.getRemittanceInformation()));
+
+        verify(transactionService, times(1)).searchTransactions(eq(DEFAULT_TEST_ACCOUNT_ID), eq(null), eq(null), eq(null));
+    }
+
+   //deve ritornare una lista di transazioni quando un range di date è formito
+   @Test
+   void transactions_shouldReturnFilteredTransactions_whenDateRangeProvided() {
+        LocalDate fromDate = LocalDate.of(2023, 1, 1);
+        LocalDate toDate = LocalDate.of(2023, 1, 31);
+
+        when(transactionService.searchTransactions(DEFAULT_TEST_ACCOUNT_ID, fromDate, toDate, null))
+            .thenReturn(List.of(transactionTestCosto, transactionTestProfitto));
+
+        given()
+            .auth().basic("user", "userpassword")
+            .queryParam("from", "2023-01-01")
+            .queryParam("to", "2023-01-31")
+            .when()
+                .get("/transactions")
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("size()", is(2));
+            
+            verify(transactionService, times(1)).searchTransactions(eq(DEFAULT_TEST_ACCOUNT_ID), eq(fromDate), eq(toDate), eq(null));
+   }
+
+   //deve restituire una lista di transazioni quando un "Tipo Centro" è fornito
+   @Test
+   void transactions_shouldReturnFilteredTransactions_whenCenterTypeIsProvided() {
+        when(transactionService.searchTransactions(eq(DEFAULT_TEST_ACCOUNT_ID), eq(null), eq(null), eq(CenterType.COSTO)))
+            .thenReturn(List.of(transactionTestCosto, transactionTestCosto2));
+        
+        given()
+        .auth().basic("user", "userpassword")
+        .queryParam("centerType", "COSTO")
+        .when()
+            .get("/transactions")
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            .body("size()", is(2))
+            .body("[0].centerType", is(CenterType.COSTO.name()))
+            .body("[1].centerType", is(CenterType.COSTO.name()));
+        
+        verify(transactionService, times(1)).searchTransactions(eq(DEFAULT_TEST_ACCOUNT_ID), eq(null), eq(null), eq(CenterType.COSTO));
+
+   }
+
+   //deve ritornare una lista di transazioni quando range di date e tipo Centro sono entrambi forniti
+   @Test
+   void transactions_shouldReturnFilteredTransactions_whenCenterTypeAndDatesAreProvided() {
+        LocalDate fromDate = LocalDate.of(2023, 1, 1);
+        LocalDate toDate = LocalDate.of(2023, 1, 31);
+
+        when(transactionService.searchTransactions(eq(DEFAULT_TEST_ACCOUNT_ID), eq(fromDate), eq(toDate), eq(CenterType.PROFITTO)))
+            .thenReturn(List.of(transactionTestProfitto));
+        
+        given()
+            .auth().basic("user", "userpassword")
+            .queryParam("from", "2023-01-01")
+            .queryParam("to", "2023-01-31")
+            .queryParam("centerType", "PROFITTO")
+        .when()
+            .get("/transactions")
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            .body("size()", is(1))
+            .body("[0].remittanceInformation", is(transactionTestProfitto.getRemittanceInformation()))
+            .body("[0].centerType", is(CenterType.PROFITTO.name()));
+
+        verify(transactionService, times(1)).searchTransactions(eq(DEFAULT_TEST_ACCOUNT_ID), eq(fromDate), eq(toDate), eq(CenterType.PROFITTO));
+   }
+   
+   //deve restituire una lista vuota quando non trova nessuna transazione
+   @Test
+   void transactions_shouldReturnEmptyList_whenNoTransactionIsFound() {
+        when(transactionService.searchTransactions(any(), any(), any(), any()))
+            .thenReturn(Collections.emptyList());
+        
+            given()
+            .auth().basic("user", "userpassword")
+            .when()
+                .get("/transactions")
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("size()", is(0))
+                .body("", is(empty()));
+
+        verify(transactionService, times(1)).searchTransactions(eq(DEFAULT_TEST_ACCOUNT_ID), eq(null), eq(null), eq(null));
+   }
+
+   // deve restituire errore 400 quando viene fornita solo la data From
+   @Test
+   void transactions_shouldReturnBadRequest_whenOnlyDateFromIsProvided() {
+        given()
+        .auth().basic("user", "userpassword")
+        .queryParam("from", "2023-01-01")
+        .when()
+            .get("/transactions")
+        .then()
+            .statusCode(400)
+            .body(is("Per il filtro per data, entrambi i parametri 'from' e 'to' sono obbligatori."));
+        
+        verify(transactionService, never()).searchTransactions(any(), any(), any(), any());
+   }
+
+   //deve restituire errore 400 quando viene fornita solo la data To
+   @Test
+   void transactions_shouldReturnBadrequest_whenOnlyDateToIsProvided() {
+        given()
+        .auth().basic("user", "userpassword")
+        .queryParam("to", "2023-01-31")
+        .when()
+            .get("/transactions")
+        .then()
+            .statusCode(400)
+            .body(is("Per il filtro per data, entrambi i parametri 'from' e 'to' sono obbligatori."));
+
+        verify(transactionService, never()).searchTransactions(any(), any(), any(), any());
+
+   }
+
+   //deve restituire errore 400 quando il fomato data non è valido
+   @Test
+   void transactions_shouldReturnbadRequest_whenDateFormatInvalid() {
+        given()
+        .auth().basic("user", "userpassword")
+        .queryParam("from", "2023/01/01")
+        .queryParam("to", "2023-01-31")
+        .when() 
+            .get("/transactions")
+        .then()
+            .statusCode(400)
+            .body(is("Formato data non valido per 'from' o 'to'. Utilizzare il formato YYYY-MM-DD."));
+        
+        verify(transactionService, never()).searchTransactions(any(), any(), any(), any());
+
+   }
+
+   // deve restituire errore 400 quando le date from e to sono invertite
+   @Test
+   void transactions_shouldReturnBadrequest_whenDatesAreInverted() {
+        given()
+        .auth().basic("user", "userpassword")
+        .queryParam("from", "2023-01-31")
+        .queryParam("to", "2023-01-01")
+        .when()
+            .get("/transactions")
+        .then()
+            .statusCode(400)
+            .body(is("La data 'from' non può essere successiva alla data 'to'."));
+        
+        verify(transactionService, never()).searchTransactions(any(), any(), any(), any());
+   }
+
+   //deve restituire errore 400 quando il tipo Centro non è valido
+   @Test
+   void transactions_shouldReturnBadRequest_whenCenterTypeIsInvalid() {
+        given()
+        .auth().basic("user", "userpassword")
+        .queryParam("centerType", "INVALID_TYPE")
+        .when()
+            .get("/transactions")
+        .then()
+            .statusCode(400)
+            .body(is("Tipo center non valido. Valori possibili: COSTO, PROFITTO"));
+        
+        verify(transactionService, never()).searchTransactions(any(), any(), any(), any());
+   }
+
+   //deve retituire errore 500 quando viene lanciata un eccezione
+   @Test
+   void transactions_shouldreturnInternalServerError_whenServiceThrowException() {
+        when(transactionService.searchTransactions(any(), any(), any(), any())).thenThrow
+            (new RuntimeException("Errore server simulato"));
+
+        given()
+        .auth().basic("user", "userpassword")
+        .when()
+            .get("/transactions")
+        .then()
+            .statusCode(500)
+            .body(is("Errore durante il recupero/filtro dei movimenti: Errore server simulato"));
+   }
+
+   // deve restituire errore 401 non autorizzato quando non si effettua l'autenticazione
+   @Test
+   void transactions_shouldReturnUnathorized_whenNotAuthenticated() {
+        given()
+        .when()
+            .get("/transactions")
+        .then()
+            .statusCode(401);
+        
+        verify(transactionService, never()).searchTransactions(any(), any(), any(), any());
+   }
     /*
     @Test
     void getTransactions_shouldReturnTransactions_ifFound() {
@@ -281,25 +494,7 @@ public class TransactionControllerTest {
     }
     */
 
-    // --- TEST per l'ENDPOINT GET /movimenti (l'unico attivo) ---
+    // --- TEST per l'ENDPOINT GET /transactions ---
 
-    @Test
-    void filtraMovimenti_shouldReturnTransactions_whenOnlyAccountIdProvided() {
-        // Ho cambiato accountId in "testAccountId" per coerenza con i mock di setup
-        when(transactionService.searchTransactions(eq("testAccountId"), eq(null), eq(null), eq(null)))
-            .thenReturn(List.of(transactionTestCosto, transactionTestProfitto));
-
-        given()
-            .queryParam("accountId", "testAccountId")
-            .when()
-            .get("/movimenti") // Endpoint unificato
-            .then()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body("size()", is(2))
-            .body("[0].remittanceInformation", is("Test Transaction Costo"))
-            .body("[1].remittanceInformation", is("Test Transaction Profitto"));
-
-        verify(transactionService, times(1)).searchTransactions(eq("testAccountId"), eq(null), eq(null), eq(null));
-    }
+    
 }
