@@ -1,1 +1,0 @@
-ALTER TABLE regola_classificazione DROP COLUMN jsonRule;
