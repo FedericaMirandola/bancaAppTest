@@ -1,73 +1,44 @@
 package it.coderit.banktestapp.service;
 
-import java.util.List;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import it.coderit.banktestapp.dto.Rule;
 import it.coderit.banktestapp.model.Transaction;
-import it.coderit.banktestapp.model.ClassificationRule;
 import it.coderit.banktestapp.model.CenterType;
-
+import it.coderit.banktestapp.model.ClassificationRule;
 import it.coderit.banktestapp.repository.ClassificationRuleRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class RuleEngineService {
 
+    private static final Logger log = LoggerFactory.getLogger(RuleEngineService.class);
+
     @Inject
     ClassificationRuleRepository regolaClassificazioneRepository;
 
-    @Inject
-    ObjectMapper objectMapper;
 
     @Transactional
     public void classifyTransaction(Transaction transaction) {
-        List<ClassificationRule> rules = regolaClassificazioneRepository.findAllRegole();
+        log.info("Tentativo di classificare la transazione con ID: {}", transaction.getTransactionId());
 
-        for (ClassificationRule regola : rules) {
-            try {
-                Rule rule = objectMapper.readValue(regola.getJsonRule(), Rule.class);
-
-                boolean matchesAll = rule.conditions.stream().allMatch(cond -> {
-                    String fieldValue = extractFieldValue(transaction, cond.field);
-                    if (fieldValue == null)
-                        return false;
-                    return cond.keywords.stream()
-                            .anyMatch(kw -> fieldValue.toLowerCase().contains(kw.toLowerCase()));
-                });
-
-                if (matchesAll) {
-                    transaction.setCenterType(regola.getCenterType());
-                    return;
-                }
-            } catch (Exception e) {
-                System.err.println("Errore parsing json_rule per regola id=" + regola.getId() + ": " + e.getMessage());
+        if(Boolean.TRUE.equals(transaction.getIsManuallyClassified())) {
+            log.debug("Transazione {} classificata manualmente.Salta la classificazione automatica!", transaction.getTransactionId());
+            return;
+        }
+        regolaClassificazioneRepository.findCenterByJeyWord(transaction)
+        .ifPresentOrElse(
+            //se una regola matcha il centerType allora la assegna ad un centro
+            matchedCenterType -> {
+                transaction.setCenterType(matchedCenterType);
+                log.info("Transazione ID: {} classificata come: {}", transaction.getTransactionId());
+            },
+            //se nessuna regola matcha il centerType allora laassegna ad UNDEFINED
+            () -> {
+                transaction.setCenterType(CenterType.UNDEFINED);
             }
-        }
-
-        // Nessuna regola soddisfatta -> center di default
-        transaction.setCenterType(CenterType.COSTO);
-        System.err.println("Nessuna regola applicata, applicato center di default COSTO");
-    }
-
-    private String extractFieldValue(Transaction transaction, String field) {
-        switch (field) {
-            case "remittanceInformationUnstructured":
-                return transaction.getRemittanceInformation();
-            case "DebtorName":
-                return transaction.getDebtorName();
-            case "CreditorName":
-                return transaction.getCreditorName();
-            case "bankTransactionCode":
-                return transaction.getBankTransactionCode();
-            case "propietaryBankTransactionCode":
-                return transaction.getProprietaryBankTransactionCode();
-            default:
-                return null;
-        }
+        );
     }
 
 }

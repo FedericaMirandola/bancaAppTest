@@ -3,27 +3,32 @@ package it.coderit.banktestapp.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+
 @Entity
 @Data
-@Table(name = "regola_classificazione")
+@Table(name = "classification_rule")
 public class ClassificationRule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    @Column(name = "parola_chiave", nullable = false, length = 255)
+    @Column(name = "keyword", nullable = false, length = 255)
     private String keyword;
 
-    @Column(name = "json_rule", columnDefinition = "TEXT")
-    private String jsonRule;
-
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private CenterType center;
+    @Column(name = "center_type", nullable = false)
+    private CenterType centerType;
+
+    public ClassificationRule() {}
+
+    public ClassificationRule(String keyword, CenterType centerType) {
+        this.keyword = keyword;
+        this.centerType = centerType;
+    }
 
     public CenterType getCenterType() {
-        return center;
+        return centerType;
     }
 
    

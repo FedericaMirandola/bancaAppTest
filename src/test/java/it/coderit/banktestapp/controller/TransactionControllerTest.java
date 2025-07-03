@@ -3,6 +3,7 @@ package it.coderit.banktestapp.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.mockito.ArgumentCaptor;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
@@ -10,6 +11,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
@@ -17,6 +19,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -31,6 +34,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import it.coderit.banktestapp.dto.CredemTransactionResponse;
 import it.coderit.banktestapp.model.Transaction;
+import it.coderit.banktestapp.repository.TransactionRepository;
 import it.coderit.banktestapp.model.CenterType;
 import it.coderit.banktestapp.service.TransactionService;
 
@@ -41,6 +45,9 @@ public class TransactionControllerTest {
 
     @InjectMock
     TransactionService transactionService;
+
+    @InjectMock
+    TransactionRepository transactionRepository;
 
     private final String DEFAULT_TEST_ACCOUNT_ID = "IT001000000000000000001";
 
@@ -299,202 +306,107 @@ public class TransactionControllerTest {
         
         verify(transactionService, never()).searchTransactions(any(), any(), any(), any());
    }
-    /*
-    @Test
-    void getTransactions_shouldReturnTransactions_ifFound() {
-        when(transactionService.searchTransactions(
-            eq(accountId),
-            eq(LocalDate.parse("2023-10-01")),
-            eq(LocalDate.parse("2023-10-31")),
-            eq(null)
-        )).thenReturn(List.of(transactionTestCosto));
 
+   @Test
+    void manualClassifyTransaction_shouldUpdateCenterTypeAndSetManualFlag_whenValid() {
         given()
-            .when()
-            .get("/movimenti/{accountId}/transactions?from=2023-10-01&to=2023-10-31", accountId)
-            .peek()
-            .then()
-            .statusCode(200)
             .contentType(ContentType.JSON)
-            .body("size()", is(1))
-            .body("[0].remittanceInformation", is("Test Transaction Costo"));
+            .queryParam("centerType", "PROFITTO")
+        .when()
+            .put("/movimenti/{transactionId}/manual-classify", "trans_id_undefined")
+        .then()
+            .statusCode(200)
+            .body(is("Transazione ID 'trans_id_undefined' classificata manualmente come 'PROFITTO'."));
 
-        verify(transactionService, times(1)).searchTransactions(
-            eq(accountId),
-            eq(LocalDate.parse("2023-10-01")),
-            eq(LocalDate.parse("2023-10-31")),
-            eq(null));
+        // Verifica che il repository sia stato chiamato per trovare la transazione
+        verify(transactionRepository, times(1)).find("transactionId", "trans_id_undefined");
+        
+        // Verifica che la transazione sia stata persistita con i nuovi valori usando argThat
+        verify(transactionRepository, times(1)).persist((Transaction) argThat(transaction -> {
+            Transaction t = (Transaction) transaction;
+            return t.getCenterType() == CenterType.PROFITTO && // Verifica il centerType
+                   t.getIsManuallyClassified() == true &&    // Verifica il flag manuale
+                   "trans_id_undefined".equals(t.getTransactionId()); // Verifica l'ID transazione
+        }));
     }
 
     @Test
-    void getTransactions_shouldReturnNotFound_whenNoTransactionIsFound() {
-        when(transactionService.searchTransactions(
-            eq(accountId),
-            eq(LocalDate.parse("2023-10-01")),
-            eq(LocalDate.parse("2023-10-31")),
-            eq(null))).thenReturn(Collections.emptyList());
-
+    void manualClassifyTransaction_shouldReturnNotFound_whenTransactionDoesNotExist() {
         given()
-            .when()
-            .get("/movimenti/{accountId}/transactions?from=2023-10-01&to=2023-10-31", accountId)
-            .then()
+            .contentType(ContentType.JSON)
+            .queryParam("centerType", "COSTO")
+        .when()
+            .put("/movimenti/{transactionId}/manual-classify", "non_esistente")
+        .then()
             .statusCode(404)
-            .body(containsString("Nessuna transazione trovata"));
+            .body(containsString("Transazione con ID 'non_esistente' non trovata."));
+
+        verify(transactionRepository, times(1)).find("transactionId", "non_esistente");
+        verify(transactionRepository, never()).persist(any(Transaction.class)); // Non deve persistere nulla
     }
 
     @Test
-    void getTransactions_shouldReturnBadRequest_whenParameterIsMissing() {
+    void manualClassifyTransaction_shouldReturnBadRequest_whenCenterTypeIsMissing() {
         given()
-            .when()
-            .get("/movimenti/{accountId}/transactions", accountId)
-            .then()
+            .contentType(ContentType.JSON)
+            // Nessun queryParam "centerType"
+        .when()
+            .put("/movimenti/{transactionId}/manual-classify", "trans_id_undefined")
+        .then()
             .statusCode(400)
-            .body(containsString("Parametri 'from' e 'to' obbligatori"));
+            .body(containsString("Il parametro 'centerType' Ã¨ obbligatorio e non puÃ² essere vuoto."));
+
+        verify(transactionRepository, never()).find(anyString(), anyString()); // Nessuna interazione col DB
+        verify(transactionRepository, never()).persist(any(Transaction.class));
     }
 
     @Test
-    void getTransactions_shouldReturnInternalServerError_whenExceptionOccurs() {
-        reset(transactionService);
-        when(transactionService.searchTransactions(
-            eq(accountId),
-            any(LocalDate.class),
-            any(LocalDate.class),
-            eq(null)
-        )).thenThrow(new RuntimeException("Errore DB simulato"));
+    void manualClassifyTransaction_shouldReturnBadRequest_whenInvalidCenterType() {
+        given()
+            .contentType(ContentType.JSON)
+            .queryParam("centerType", "INVALIDO") // Tipo non valido
+        .when()
+            .put("/movimenti/{transactionId}/manual-classify", "trans_id_undefined")
+        .then()
+            .statusCode(400)
+            .body(containsString("Tipo center non valido. Valori possibili: COSTO, PROFITTO."));
+
+        verify(transactionRepository, never()).find(anyString(), anyString());
+        verify(transactionRepository, never()).persist(any(Transaction.class));
+    }
+
+    @Test
+    void manualClassifyTransaction_shouldReturnBadRequest_whenCenterTypeIsUndefined() {
+        given()
+            .contentType(ContentType.JSON)
+            .queryParam("centerType", "UNDEFINED") // Non permesso per classificazione manuale
+        .when()
+            .put("/movimenti/{transactionId}/manual-classify", "trans_id_undefined")
+        .then()
+            .statusCode(400)
+            .body(containsString("Non puoi classificare manualmente una transazione come 'UNDEFINED'. Usa 'COSTO' o 'PROFITTO'."));
+
+        verify(transactionRepository, never()).find(anyString(), anyString());
+        verify(transactionRepository, never()).persist(any(Transaction.class));
+    }
+
+    @Test
+    void manualClassifyTransaction_shouldReturnInternalServerError_whenRepositoryFails() {
+        // Simula un errore quando il repository cerca la transazione
+        when(transactionRepository.find("trans_id_error").firstResultOptional())
+            .thenThrow(new RuntimeException("Errore DB simulato durante la ricerca"));
 
         given()
-            .when()
-            .get("/movimenti/{accountId}/transactions?from=2023-10-01&to=2023-10-31", accountId)
-            .then()
+            .contentType(ContentType.JSON)
+            .queryParam("centerType", "COSTO")
+        .when()
+            .put("/movimenti/{transactionId}/manual-classify", "trans_id_error")
+        .then()
             .statusCode(500)
-            .body(containsString("Errore durante il recupero delle transazioni"));
+            .body(containsString("Errore durante la classificazione manuale della transazione: Errore DB simulato durante la ricerca"));
+
+        verify(transactionRepository, times(1)).find("transactionId", "trans_id_error");
+        verify(transactionRepository, never()).persist(any(Transaction.class));
     }
-
-    @Test
-    void getTransactions_shouldReturnBadRequest_whenDatesAreInverted() {
-        given()
-            .when()
-            .get("/movimenti/{accountId}/transactions?from=2023-10-31&to=2023-10-01", accountId)
-            .then()
-            .statusCode(400)
-            .body(containsString("La data 'from' non può essere successiva alla data 'to'."));
-    }
-
-    @Test
-    void scarica_shouldReturnOk_whenSuccessful() {
-        doNothing().when(transactionService).downloadAndSave(anyString(), anyString(), anyString());
-
-        given()
-            .when()
-            .get("/movimenti/scarica?from=2023-10-01&to=2023-10-31")
-            .then()
-            .statusCode(200)
-            .body("message", containsString("Movimenti scaricati e salvati"));
-
-        verify(transactionService, times(1)).downloadAndSave(eq(accountId), eq("2023-10-01"), eq("2023-10-31"));
-    }
-
-    @Test
-    void scarica_shouldReturnBadRequest_whenMissingParams() {
-        given()
-            .when()
-            .get("/movimenti/scarica")
-            .then()
-            .statusCode(400)
-            .body(containsString("Parametri 'from' e 'to' obbligatori"));
-    }
-
-    @Test
-    void scarica_shouldReturnBadRequest_whenDatesAreInverted() {
-        given()
-            .when()
-            .get("/movimenti/scarica?from=2023-10-31&to=2023-10-01")
-            .then()
-            .statusCode(400)
-            .body(containsString("La data 'from' non può essere successiva alla data 'to'."));
-    }
-
-    @Test
-    void classifyAndSave_shouldReturnOk_whenSuccessful() {
-        CredemTransactionResponse mockResponse = new CredemTransactionResponse();
-        mockResponse.booked = List.of(
-            new CredemTransactionResponse.TransactionData(),
-            new CredemTransactionResponse.TransactionData());
-
-        doNothing().when(transactionService).saveTransactionsFromDTOList(any(List.class), anyString());
-
-        given()
-            .contentType(ContentType.JSON)
-            .body(mockResponse)
-            .when()
-            .post("/movimenti/classify")
-            .then()
-            .statusCode(200);
-
-        verify(transactionService, times(1)).saveTransactionsFromDTOList(any(List.class), eq(accountId));
-    }
-
-    @Test
-    void classifyAndSave_shouldReturnBadRequest_whenEmptyBody() {
-        given()
-            .contentType(ContentType.JSON)
-            .body("{}")
-            .when()
-            .post("/movimenti/classify")
-            .then()
-            .statusCode(400)
-            .body(containsString("Il corpo della richiesta è vuoto o non contiene transazioni 'booked'"));
-    }
-
-    @Test
-    void classifyAndSave_shouldReturnBadRequest_whenNullBookedTransaction() {
-        CredemTransactionResponse mockResponse = new CredemTransactionResponse();
-        mockResponse.booked = null;
-
-        given()
-            .contentType(ContentType.JSON)
-            .body(mockResponse)
-            .when()
-            .post("/movimenti/classify")
-            .then()
-            .statusCode(400)
-            .body(containsString("Il corpo della richiesta è vuoto o non contiene transazioni 'booked'."));
-    }
-
-    @Test
-    void classifyAndSave_shouldReturnOk_whenEmptyBookedList() {
-        CredemTransactionResponse mockResponse = new CredemTransactionResponse();
-        mockResponse.booked = Collections.emptyList();
-
-        doNothing().when(transactionService).saveTransactionsFromDTOList(any(List.class), anyString());
-
-        given()
-            .contentType(ContentType.JSON)
-            .body(mockResponse)
-            .when()
-            .post("/movimenti/classify")
-            .then()
-            .statusCode(200);
-
-        verify(transactionService, times(1)).saveTransactionsFromDTOList(any(List.class), eq(accountId));
-    }
-
-    @Test
-    void ClassifyAndSave_shouldReturnBadRequest_whenBookedFieldIsMissing() {
-        String requestBody = "{\"someOtherField\": \"value\", \"id\": 123}";
-
-        given()
-            .contentType(ContentType.JSON)
-            .body(requestBody)
-            .when()
-            .post("/movimenti/classify")
-            .then()
-            .statusCode(400)
-            .body(containsString("Il corpo della richiesta è vuoto o non contiene transazioni 'booked'."));
-    }
-    */
-
-    // --- TEST per l'ENDPOINT GET /transactions ---
-
     
 }

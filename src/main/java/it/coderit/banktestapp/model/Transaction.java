@@ -3,6 +3,7 @@ package it.coderit.banktestapp.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -14,14 +15,14 @@ import java.time.OffsetDateTime;
 @Entity
 @Table(name = "transaction")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Transaction{
+public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     public Long id;
 
-    @Column(name = "transaction_id", length = 255)
+    @Column(name = "transaction_id", length = 255, unique = true)
     public String transactionId;
 
     @Column(name = "booking_date")
@@ -59,7 +60,10 @@ public class Transaction{
     @Column(length = 255, name = "account_id")
     public String accountId;
 
-    @Column(name = "center", nullable = false)
+    @Column(name = "center_type", nullable = false)
     @Enumerated(EnumType.STRING)
     public CenterType centerType; 
+
+    @Column(name = "is_manually_classified", nullable = false)
+    public Boolean isManuallyClassified  = false;
 }

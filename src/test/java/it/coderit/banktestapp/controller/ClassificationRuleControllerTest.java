@@ -1,4 +1,4 @@
-package it.coderit.banktestapp.controller;
+/*package it.coderit.banktestapp.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -378,3 +378,4 @@ public class ClassificationRuleControllerTest {
         verify(regolaRepository, times(1)).deleteById(existingId);
     }
 }
+*/

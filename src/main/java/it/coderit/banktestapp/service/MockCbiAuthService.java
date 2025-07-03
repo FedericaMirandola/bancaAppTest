@@ -1,38 +1,31 @@
 package it.coderit.banktestapp.service;
 
-import java.util.Map;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-
-import it.coderit.banktestapp.rest.CbiAuthClient;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
+/**
+ * Servizio mock per l'autenticazione CBI.
+ * Fornisce token e autorizzazioni PSU hardcoded per scopi di test/sviluppo.
+ */
 @ApplicationScoped
 public class MockCbiAuthService {
-     
-    @ConfigProperty(name = "cbi.client-id")
-    String clientId;
+    // Token TPP fisso 
+    private static final String MOCK_TPP_ACCESS_TOKEN = "Bearer MOCK_TPP_ACCESS_TOKEN_XYZ123";
 
-    @ConfigProperty(name = "cbi.client-secret")
-    String clientSecret;
+    // Autorizzazione PSU fissa (simula il "PSU-Authorization" ottenuto dal redirect flow)
+    
+    private static final String MOCK_PSU_AUTHORIZATION = "Bearer MOCK_PSU_AUTHORIZATION_ABC456";
 
-    @Inject
-    @RestClient
-    CbiAuthClient authClient;
-
+    // Restituisce un token di accesso TPP mockato.
     public String getAccessToken() {
-        Map<String, Object> response = authClient.getToken("client_credentials", clientId, clientSecret);
-        return "Bearer " + response.get("access_token").toString();
+        return MOCK_TPP_ACCESS_TOKEN;
     }
 
-    public String getClientId() {
-        return clientId;
+    
+    // Restituisce un'autorizzazione PSU mockata.
+    public String getPsuAccessToken(String psuId, String consentId) {
+        // Possiamo includere psuId e consentId nel mock per debugging, ma la stringa è fissa
+        return MOCK_PSU_AUTHORIZATION + "_PSU_" + psuId + "_CONSENT_" + consentId;
     }
 
-    public String getClientSecret() {
-        return clientSecret;
-    }
-
+    
 }

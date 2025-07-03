@@ -2,6 +2,7 @@ package it.coderit.banktestapp.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,73 +15,62 @@ import it.coderit.banktestapp.model.CenterType;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class ClassificationRuleRepository implements PanacheRepository<ClassificationRule> {
 
+    private static final Logger log = LoggerFactory.getLogger(ClassificationRuleRepository.class);
+
     @Inject
     EntityManager em;
 
-    @Inject
-    ObjectMapper objectMapper;
+    public Optional<CenterType> findCenterByJeyWord(Transaction transaction) {
+        List<ClassificationRule> allRules = listAll();
 
-    public Optional<CenterType> findCentroByParolaChiave(Transaction transaction) {
-        List<ClassificationRule> tutteLeRegole = listAll();
-
-        List<String> valoriDaCercare = List.of(
+        List<String> transactionFieldsToSerach = Stream.of(
                 transaction.getRemittanceInformation(),
                 transaction.getCreditorName(),
                 transaction.getDebtorName(),
-                transaction.getProprietaryBankTransactionCode(),
-                transaction.getBankTransactionCode())
-                .stream()
+                transaction.getProprietaryBankTransactionCode())
                 .filter(java.util.Objects::nonNull)
                 .map(String::toLowerCase)
                 .toList();
+        log.debug("Valori della transazione da cercare: {}", transactionFieldsToSerach);
 
-        for (ClassificationRule regola : tutteLeRegole) {
-            String jsonRule = regola.getJsonRule();
-            if (jsonRule == null || jsonRule.isEmpty()) {
-                continue;
-            }
+        for (ClassificationRule rule : allRules) {
+            String ruleKeyword = rule.getKeyword().toLowerCase();
+            log.debug("Valutazione regola: ID={}, Keyword='{}', CenterType={}", rule.getId(),
+                    rule.getKeyword(), rule.getCenterType());
 
-            try {
-                JsonNode root = objectMapper.readTree(jsonRule);
-                JsonNode keywordsNode = root.get("keywords");
+            boolean keywordFound = transactionFieldsToSerach.stream()
+                    .anyMatch(fieldValue -> fieldValue.contains(ruleKeyword));
 
-                if (keywordsNode != null && keywordsNode.isArray()) {
-                    for (JsonNode keywordNode : keywordsNode) {
-                        String keyword = keywordNode.asText().toLowerCase();
-
-                        for (String valore : valoriDaCercare) {
-                            if (valore.contains(keyword)) {
-                                return Optional.of(regola.getCenter());
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
-            
-                e.printStackTrace();
+            if (keywordFound) {
+                log.info("Regola ID={} con keyword '{}' ha trovato corrispondenza. Assegnato CenterType: {}",
+                        rule.getId(), rule.getKeyword(), rule.getCenterType());
+                return Optional.of(rule.getCenterType());
             }
         }
 
+        log.info("Nessuna regola di classificazione ha trovato corrispondenza per la transazione.");
         return Optional.empty();
     }
 
     public void saveIfNotExists(String keyword, CenterType center) {
         boolean exist = find("LOWER(keyword) = ?1", keyword.toLowerCase()).firstResultOptional().isPresent();
         if (!exist) {
-            ClassificationRule regola = new ClassificationRule();
-            regola.setKeyword(keyword.toLowerCase());
-            regola.setCenter(center);
-            persist(regola);
+            ClassificationRule rule = new ClassificationRule(keyword, center);
+            persist(rule);
+            log.info("Creata nuova regola di classificazione: Keyword='{}', CenterType={}", keyword, center);
+        } else {
+            log.info("Regola con keyword '{}' esistente, nessuna creazione.", keyword);
         }
     }
 
     public List<ClassificationRule> findAllRegole() {
-        return getEntityManager().createQuery("FROM ClassificationRule", ClassificationRule.class)
-                .getResultList();
+        return listAll();
     }
 
 }

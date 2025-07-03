@@ -1,0 +1,2 @@
+ALTER TABLE transaction
+ADD COLUMN IF NOT EXISTS is_manually_classified BOOLEAN NOT NULL DEFAULT FALSE;

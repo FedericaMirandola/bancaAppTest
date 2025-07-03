@@ -2,7 +2,9 @@ package it.coderit.banktestapp.model;
 
 public enum CenterType {
     COSTO("Costo"),
-    PROFITTO("Profitto");
+    PROFITTO("Profitto"),
+    UNDEFINED("Undefined");
+
     private final String name; 
 
     private CenterType(String name) {

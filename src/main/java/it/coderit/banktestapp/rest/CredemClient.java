@@ -8,8 +8,6 @@ import it.coderit.banktestapp.dto.CredemBalancesResponse;
 import it.coderit.banktestapp.dto.CredemSingleAccountResponse;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.QueryParam;
 
 
 @Path("/accounts")
@@ -18,56 +16,71 @@ import jakarta.ws.rs.QueryParam;
 public interface CredemClient {
     
     @GET
-    @Path("/{accountId}/transactions")
-    CredemTransactionResponse getTransactions(
-        @HeaderParam("PSU-ID") String psuId,
-        @HeaderParam("Authorization") String token,
-        @HeaderParam("X-Request-ID") String xRequestId,
-        @HeaderParam("Consent-ID") String consentId,
-        @HeaderParam("Date") String dateHeader,
-        @HeaderParam("Digest") String digest,
-        @HeaderParam("Signature") String signature,
-        @HeaderParam("TPP-Signature-Certificate") String tppSignatureCertificate,
-        @HeaderParam("PSU-Authorization") String psuAuthorization,
-        @HeaderParam("PSU-IP-Address") String psuIpAddress,
-        @HeaderParam("ASPSP-Code") String aspspCode,
-        @PathParam("accountId") String accountId,
-        @QueryParam("dateFrom") String dateFrom,
-        @QueryParam("dateTo") String dateTo,
-        @QueryParam("limit") Integer limit,     
-        @QueryParam("offset") Integer offset
-        
-    );
+        @Path("/{accountId}/transactions")
+        CredemTransactionResponse getTransactions(
+                @HeaderParam("PSU-ID") String psuId,
+                @HeaderParam("Authorization") String authorization, 
+                @HeaderParam("X-Request-ID") String xRequestId,
+                @HeaderParam("Consent-ID") String consentId,
+                @HeaderParam("Date") String date,
+                @HeaderParam("Digest") String digest, 
+                @HeaderParam("Signature") String signature, 
+                @HeaderParam("TPP-Signature-Certificate") String tppSignatureCertificate, 
+                @HeaderParam("PSU-Authorization") String psuAuthorization,
+                @HeaderParam("PSU-IP-Address") String psuIpAddress,
+                @HeaderParam("ASPSP-Code") String aspspCode,
+                @PathParam("accountId") String accountId,
+                @QueryParam("fromBookingDate") String fromBookingDate,
+                @QueryParam("toBookingDate") String toBookingDate,
+                @QueryParam("limit") Integer limit,
+                @QueryParam("offset") Integer offset);
 
-    @GET
-    CredemAccountResponse getAccounts (
-        @HeaderParam("psu-id") String psuId,
-        @HeaderParam("Authorization") String token,
-        @HeaderParam("Consent-id") String consentId,
-        @HeaderParam("X-Request-ID") String xRequestId,
-        @HeaderParam("Date") String dateHeader
-    );
+        @GET
+        CredemAccountResponse getAccounts(
+                @HeaderParam("PSU-ID") String psuId,
+                @HeaderParam("Authorization") String authorization, // Bearer token
+                @HeaderParam("Consent-ID") String consentId,
+                @HeaderParam("X-Request-ID") String xRequestId,
+                @HeaderParam("Date") String date,
+                @HeaderParam("Digest") String digest,
+                @HeaderParam("Signature") String signature, 
+                @HeaderParam("TPP-Signature-Certificate") String tppSignatureCertificate, 
+                @HeaderParam("PSU-Authorization") String psuAuthorization, 
+                @HeaderParam("PSU-IP-Address") String psuIpAddress, 
+                @HeaderParam("ASPSP-Code") String aspspCode 
+        );
 
-    @GET
-    @Path("/{accountId}")
-    CredemSingleAccountResponse getAccountDetails(
-        @PathParam("accountId") String accountId,
-        @HeaderParam("Consent-ID") String consentId,
-        @HeaderParam("PSU-ID") String psuId,
-        @HeaderParam("Authorization") String token,
-        @HeaderParam("X-Request-ID") String xRequestId,
-        @HeaderParam("Date") String dateHeader,
-        @QueryParam("withBalance") Boolean withBalance
-    );
+        @GET
+        @Path("/{accountId}")
+        CredemSingleAccountResponse getAccountDetails(
+                @PathParam("accountId") String accountId,
+                @HeaderParam("Consent-ID") String consentId,
+                @HeaderParam("PSU-ID") String psuId,
+                @HeaderParam("Authorization") String authorization,
+                @HeaderParam("X-Request-ID") String xRequestId,
+                @HeaderParam("Date") String date,
+                @HeaderParam("Digest") String digest,
+                @HeaderParam("Signature") String signature,
+                @HeaderParam("TPP-Signature-Certificate") String tppSignatureCertificate,
+                @HeaderParam("PSU-Authorization") String psuAuthorization,
+                @HeaderParam("PSU-IP-Address") String psuIpAddress,
+                @HeaderParam("ASPSP-Code") String aspspCode,
+                @QueryParam("withBalance") Boolean withBalance);
 
-    @GET
-    @Path("/{accountId}/balances")
-    CredemBalancesResponse getAccountBalances(
-        @PathParam("account-id") String accountId,
-        @HeaderParam("Consent-ID") String consentId,
-        @HeaderParam("PSU-ID") String psuId,
-        @HeaderParam("Authorization") String token,
-        @HeaderParam("X-Request-ID") String xRequestId,
-        @HeaderParam("Date") String dateHeader
-    );
+        @GET
+        @Path("/{accountId}/balances")
+        CredemBalancesResponse getAccountBalances(
+                @PathParam("accountId") String accountId,
+                @HeaderParam("Consent-ID") String consentId,
+                @HeaderParam("PSU-ID") String psuId,
+                @HeaderParam("Authorization") String authorization,
+                @HeaderParam("X-Request-ID") String xRequestId,
+                @HeaderParam("Date") String date,
+                @HeaderParam("Digest") String digest,
+                @HeaderParam("Signature") String signature,
+                @HeaderParam("TPP-Signature-Certificate") String tppSignatureCertificate, 
+                @HeaderParam("PSU-Authorization") String psuAuthorization, 
+                @HeaderParam("PSU-IP-Address") String psuIpAddress, 
+                @HeaderParam("ASPSP-Code") String aspspCode 
+        );
 }
