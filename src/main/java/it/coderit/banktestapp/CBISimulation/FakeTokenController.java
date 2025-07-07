@@ -1,4 +1,4 @@
-package it.coderit.banktestapp.controller;
+package it.coderit.banktestapp.CBISimulation;
 
 import java.util.Map;
 

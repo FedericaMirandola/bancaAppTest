@@ -1,0 +1,100 @@
+{
+  "booked": [
+    {
+      "transactionId": "TXN-900",
+      "bookingDate": "2025-07-02T10:30:00+02:00",
+      "valueDate": "2025-07-02T10:30:00+02:00",
+      "transactionAmount": {
+        "amount": -45.70,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Caffè e cornetto",
+      "creditorName": "Bar Centrale",
+      "debtorName": "Tu",
+      "bankTransactionCode": "4001",
+      "proprietaryBankTransactionCode": "CBI-00028",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-901",
+      "bookingDate": "2025-07-03T16:00:00+02:00",
+      "valueDate": "2025-07-03T16:00:00+02:00",
+      "transactionAmount": {
+        "amount": 250.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Regalo di compleanno",
+      "creditorName": "Zia Maria",
+      "debtorName": "Tu",
+      "bankTransactionCode": "4002",
+      "proprietaryBankTransactionCode": "CBI-00029",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-902",
+      "bookingDate": "2025-07-04T08:15:00+02:00",
+      "valueDate": "2025-07-04T08:15:00+02:00",
+      "transactionAmount": {
+        "amount": -15.99,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Ricarica telefonica",
+      "creditorName": "Operatore Mobile",
+      "debtorName": "Tu",
+      "bankTransactionCode": "4003",
+      "proprietaryBankTransactionCode": "CBI-00030",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-903",
+      "bookingDate": "2025-07-05T11:00:00+02:00",
+      "valueDate": "2025-07-05T11:00:00+02:00",
+      "transactionAmount": {
+        "amount": -80.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Visita medica",
+      "creditorName": "Dott. Rossi",
+      "debtorName": "Tu",
+      "bankTransactionCode": "4004",
+      "proprietaryBankTransactionCode": "CBI-00031",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-904",
+      "bookingDate": "2025-07-06T19:45:00+02:00",
+      "valueDate": "2025-07-06T19:45:00+02:00",
+      "transactionAmount": {
+        "amount": -30.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Biglietti cinema",
+      "creditorName": "Cinema Multisala",
+      "debtorName": "Tu",
+      "bankTransactionCode": "4005",
+      "proprietaryBankTransactionCode": "CBI-00032",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-905",
+      "bookingDate": "2025-07-07T09:00:00+02:00",
+      "valueDate": "2025-07-07T09:00:00+02:00",
+      "transactionAmount": {
+        "amount": 500.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Incasso consulenza",
+      "creditorName": "Azienda Beta",
+      "debtorName": "Tu",
+      "bankTransactionCode": "4006",
+      "proprietaryBankTransactionCode": "CBI-00033",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    }
+  ]
+}

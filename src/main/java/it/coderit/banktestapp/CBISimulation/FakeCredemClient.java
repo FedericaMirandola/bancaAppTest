@@ -1,4 +1,4 @@
-package it.coderit.banktestapp.rest.fake;
+package it.coderit.banktestapp.CBISimulation;
 
 import java.io.InputStream;
 
@@ -59,9 +59,18 @@ public class FakeCredemClient implements CredemClient {
         System.out.println("  offset: " + offset);
 
 
-        String resourcePath = (offset == null || offset == 0)
-                ? "test-data/transaction_page_1.json"
-                : "test-data/transaction_page_3.json"; // Puoi aggiungere logica per page_2, ecc.
+        String resourcePath;
+        if (offset == null || offset == 0) {
+            resourcePath = "test-data/transaction_page_1.json";
+        } else if (offset == 100) {
+            resourcePath = "test-data/transaction_page_2.json";
+        } else if (offset == 200) {
+            resourcePath = "test-data/transaction_page_3.json";
+        } else if (offset == 300) {
+            resourcePath = "test-data/transaction_page_4.json";
+        } else {
+           return new CredemTransactionResponse(); //restituisce lista vuota
+        }
 
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
             if (inputStream == null) {

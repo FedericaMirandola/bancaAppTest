@@ -1,0 +1,324 @@
+{
+  "booked": [
+    {
+      "transactionId": "TXN-800",
+      "bookingDate": "2025-06-12T09:00:00+02:00",
+      "valueDate": "2025-06-12T09:00:00+02:00",
+      "transactionAmount": {
+        "amount": -55.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Subscription service - Monthly",
+      "creditorName": "Streaming XYZ",
+      "debtorName": "You",
+      "bankTransactionCode": "3001",
+      "proprietaryBankTransactionCode": "CBI-00008",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-801",
+      "bookingDate": "2025-06-13T11:15:00+02:00",
+      "valueDate": "2025-06-13T11:15:00+02:00",
+      "transactionAmount": {
+        "amount": 750.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Freelance project payment",
+      "creditorName": "Tech Solutions Ltd",
+      "debtorName": "You",
+      "bankTransactionCode": "3002",
+      "proprietaryBankTransactionCode": "CBI-00009",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-802",
+      "bookingDate": "2025-06-14T18:45:00+02:00",
+      "valueDate": "2025-06-14T18:45:00+02:00",
+      "transactionAmount": {
+        "amount": -35.50,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Grocery shopping",
+      "creditorName": "Local Market",
+      "debtorName": "You",
+      "bankTransactionCode": "3003",
+      "proprietaryBankTransactionCode": "CBI-00010",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-803",
+      "bookingDate": "2025-06-15T14:00:00+02:00",
+      "valueDate": "2025-06-15T14:00:00+02:00",
+      "transactionAmount": {
+        "amount": -150.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Car fuel",
+      "creditorName": "Gas Station",
+      "debtorName": "You",
+      "bankTransactionCode": "3004",
+      "proprietaryBankTransactionCode": "CBI-00011",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-804",
+      "bookingDate": "2025-06-16T10:30:00+02:00",
+      "valueDate": "2025-06-16T10:30:00+02:00",
+      "transactionAmount": {
+        "amount": 200.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Rental income - June",
+      "creditorName": "Tenant Smith",
+      "debtorName": "You",
+      "bankTransactionCode": "3005",
+      "proprietaryBankTransactionCode": "CBI-00012",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-805",
+      "bookingDate": "2025-06-17T17:00:00+02:00",
+      "valueDate": "2025-06-17T17:00:00+02:00",
+      "transactionAmount": {
+        "amount": -8.99,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Coffee shop",
+      "creditorName": "Cafe Central",
+      "debtorName": "You",
+      "bankTransactionCode": "3006",
+      "proprietaryBankTransactionCode": "CBI-00013",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-806",
+      "bookingDate": "2025-06-18T09:45:00+02:00",
+      "valueDate": "2025-06-18T09:45:00+02:00",
+      "transactionAmount": {
+        "amount": -45.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Internet bill",
+      "creditorName": "Telecom Provider",
+      "debtorName": "You",
+      "bankTransactionCode": "3007",
+      "proprietaryBankTransactionCode": "CBI-00014",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-807",
+      "bookingDate": "2025-06-19T13:20:00+02:00",
+      "valueDate": "2025-06-19T13:20:00+02:00",
+      "transactionAmount": {
+        "amount": 120.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Refund - online store",
+      "creditorName": "Fashion Retailer",
+      "debtorName": "You",
+      "bankTransactionCode": "3008",
+      "proprietaryBankTransactionCode": "CBI-00015",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-808",
+      "bookingDate": "2025-06-20T16:10:00+02:00",
+      "valueDate": "2025-06-20T16:10:00+02:00",
+      "transactionAmount": {
+        "amount": -22.50,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Lunch with colleagues",
+      "creditorName": "Pizzeria Da Luigi",
+      "debtorName": "You",
+      "bankTransactionCode": "3009",
+      "proprietaryBankTransactionCode": "CBI-00016",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-809",
+      "bookingDate": "2025-06-21T11:00:00+02:00",
+      "valueDate": "2025-06-21T11:00:00+02:00",
+      "transactionAmount": {
+        "amount": -99.99,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "New software license",
+      "creditorName": "Software Solutions",
+      "debtorName": "You",
+      "bankTransactionCode": "3010",
+      "proprietaryBankTransactionCode": "CBI-00017",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-810",
+      "bookingDate": "2025-06-22T08:30:00+02:00",
+      "valueDate": "2025-06-22T08:30:00+02:00",
+      "transactionAmount": {
+        "amount": 15.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Interest payment",
+      "creditorName": "Bank XYZ",
+      "debtorName": "You",
+      "bankTransactionCode": "3011",
+      "proprietaryBankTransactionCode": "CBI-00018",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-811",
+      "bookingDate": "2025-06-23T14:00:00+02:00",
+      "valueDate": "2025-06-23T14:00:00+02:00",
+      "transactionAmount": {
+        "amount": -120.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Gym membership",
+      "creditorName": "Fitness Club",
+      "debtorName": "You",
+      "bankTransactionCode": "3012",
+      "proprietaryBankTransactionCode": "CBI-00019",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-812",
+      "bookingDate": "2025-06-24T10:00:00+02:00",
+      "valueDate": "2025-06-24T10:00:00+02:00",
+      "transactionAmount": {
+        "amount": -75.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Utility bill - Water",
+      "creditorName": "Water Company",
+      "debtorName": "You",
+      "bankTransactionCode": "3013",
+      "proprietaryBankTransactionCode": "CBI-00020",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-813",
+      "bookingDate": "2025-06-25T15:30:00+02:00",
+      "valueDate": "2025-06-25T15:30:00+02:00",
+      "transactionAmount": {
+        "amount": 500.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Bonus payment",
+      "creditorName": "Employer Inc.",
+      "debtorName": "You",
+      "bankTransactionCode": "3014",
+      "proprietaryBankTransactionCode": "CBI-00021",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-814",
+      "bookingDate": "2025-06-26T11:40:00+02:00",
+      "valueDate": "2025-06-26T11:40:00+02:00",
+      "transactionAmount": {
+        "amount": -29.99,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Book purchase",
+      "creditorName": "Online Bookstore",
+      "debtorName": "You",
+      "bankTransactionCode": "3015",
+      "proprietaryBankTransactionCode": "CBI-00022",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-815",
+      "bookingDate": "2025-06-27T18:00:00+02:00",
+      "valueDate": "2025-06-27T18:00:00+02:00",
+      "transactionAmount": {
+        "amount": -18.50,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Dinner with friends",
+      "creditorName": "Local Pub",
+      "debtorName": "You",
+      "bankTransactionCode": "3016",
+      "proprietaryBankTransactionCode": "CBI-00023",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-816",
+      "bookingDate": "2025-06-28T09:10:00+02:00",
+      "valueDate": "2025-06-28T09:10:00+02:00",
+      "transactionAmount": {
+        "amount": -40.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Pharmacy visit",
+      "creditorName": "City Pharmacy",
+      "debtorName": "You",
+      "bankTransactionCode": "3017",
+      "proprietaryBankTransactionCode": "CBI-00024",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-817",
+      "bookingDate": "2025-06-29T13:00:00+02:00",
+      "valueDate": "2025-06-29T13:00:00+02:00",
+      "transactionAmount": {
+        "amount": 80.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Gift from grandma",
+      "creditorName": "Grandma",
+      "debtorName": "You",
+      "bankTransactionCode": "3018",
+      "proprietaryBankTransactionCode": "CBI-00025",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-818",
+      "bookingDate": "2025-06-30T10:00:00+02:00",
+      "valueDate": "2025-06-30T10:00:00+02:00",
+      "transactionAmount": {
+        "amount": -250.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Rent payment",
+      "creditorName": "Landlord Inc.",
+      "debtorName": "You",
+      "bankTransactionCode": "3019",
+      "proprietaryBankTransactionCode": "CBI-00026",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    },
+    {
+      "transactionId": "TXN-819",
+      "bookingDate": "2025-07-01T14:30:00+02:00",
+      "valueDate": "2025-07-01T14:30:00+02:00",
+      "transactionAmount": {
+        "amount": 1000.00,
+        "currency": "EUR"
+      },
+      "remittanceInformationUnstructured": "Salary - July",
+      "creditorName": "Your Company",
+      "debtorName": "You",
+      "bankTransactionCode": "3020",
+      "proprietaryBankTransactionCode": "CBI-00027",
+      "additionalInformation": null,
+      "accountId": "IT001000000000000000001"
+    }
+  ]
+}

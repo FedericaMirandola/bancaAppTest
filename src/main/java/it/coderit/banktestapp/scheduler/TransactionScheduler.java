@@ -41,7 +41,7 @@ public class TransactionScheduler {
     /**
      * Download ciclico secondo cron, abilitato solo se scheduler.enabled = true
      */
-    @Scheduled(delayed = "5s", cron = "{movimenti.scaricamento.cron}")
+    @Scheduled(delayed = "5s", cron = "{transaction.scaricamento.cron}")
     void scaricaPeriodicamente() {
         if (schedulerEnabled) {
             log.info("Esecuzione periodica abilitata da scheduler.enabled=true");

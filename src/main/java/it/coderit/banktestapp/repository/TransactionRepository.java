@@ -12,7 +12,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class TransactionRepository implements PanacheRepository<Transaction> {
 
-    public List<Transaction> findByCentroTipo(CenterType centerType) {
+    public List<Transaction> findByCenterType(CenterType centerType) {
         // 'centerType' è il nome del campo direttamente nella classe Transaction
         return list("centerType = ?1", centerType);
     }

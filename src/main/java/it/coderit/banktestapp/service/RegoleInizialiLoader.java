@@ -32,19 +32,11 @@ public class RegoleInizialiLoader {
             try {
                 log.info("Inizializzazione delle regole: Inserimento regole di default.");
 
-                // Regole per COSTO
-                logAndSaveRule("supermercato", CenterType.COSTO);
-                logAndSaveRule("bolletta", CenterType.COSTO);
-                logAndSaveRule("affitto", CenterType.COSTO);
+                // Regola iniziale per COSTO
                 logAndSaveRule("acquisto", CenterType.COSTO);
-                logAndSaveRule("carburante", CenterType.COSTO);
+                
 
-                // Regole per PROFITTO
-                logAndSaveRule("stipendio", CenterType.PROFITTO);
-                logAndSaveRule("bonifico", CenterType.PROFITTO);
-                logAndSaveRule("vendita", CenterType.PROFITTO);
-                logAndSaveRule("deposito", CenterType.PROFITTO);
-                logAndSaveRule("consulting", CenterType.PROFITTO);
+                // Regola iniziale per PROFITTO
                 logAndSaveRule("fattura", CenterType.PROFITTO);
 
                 log.info("Regole iniziali inserite correttamente.");

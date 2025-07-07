@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.coderit.banktestapp.CBISimulation.CredemAccountService;
+import it.coderit.banktestapp.CBISimulation.MockCbiAuthService;
 import it.coderit.banktestapp.dto.CredemAccountResponse;
 import it.coderit.banktestapp.dto.CredemTransactionResponse;
 import it.coderit.banktestapp.dto.CredemTransactionResponse.TransactionData;
@@ -61,6 +63,9 @@ public class TransactionService {
     @Inject
     MockCbiAuthService mockCbiAuthService; 
 
+    @Inject
+    CredemAccountService credemAccountService;
+
     private static final Logger log = LoggerFactory.getLogger(TransactionService.class);
     private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
     private static final DateTimeFormatter HTTP_DATE_FORMATTER = DateTimeFormatter.RFC_1123_DATE_TIME;
@@ -91,6 +96,16 @@ public class TransactionService {
 
     // --- Metodi di Business Logic ---
 
+    /**
+     * Scarica e salva i movimenti delle transazioni.
+     * Se la proprietà 'scheduler.load-from-file' è true, carica le transazioni da file di test.
+     * Altrimenti, effettua chiamate paginated all'API Credem per recuperare i movimenti
+     * e li salva nel database.
+     *
+     * @param accountId L'ID dell'account per cui scaricare i movimenti.
+     * @param from La data di inizio del periodo di scaricamento (formato YYYY-MM-DD).
+     * @param to La data di fine del periodo di scaricamento (formato YYYY-MM-DD).
+     */
     @Transactional
     public void downloadAndSave(String accountId, String from, String to) {
         log.info("Inizio scaricamento e memorizzazione movimenti per accountId: {} da {} a {}.", accountId, from, to);
@@ -158,6 +173,14 @@ public class TransactionService {
         log.info("Scaricamento movimenti completato da {} a {}.", (Object) from, (Object) to);
     }
 
+    /**
+     * Salva una lista di oggetti TransactionData (DTO) nel database come entità Transaction.
+     * Applica la logica di classificazione e previene la persistenza di transazioni duplicate
+     * basandosi sul transactionId.
+     *
+     * @param dtoList La lista di DTO delle transazioni da salvare.
+     * @param defaultAccountId L'ID dell'account da assegnare se il DTO non lo specifica.
+     */
     @Transactional
     public void saveTransactionsFromDTOList(List<TransactionData> dtoList, String defaultAccountId) {
         log.info("Inizio salvataggio movimenti da lista. Transazioni da processare: {}",
@@ -187,6 +210,13 @@ public class TransactionService {
         log.info("Salvataggio movimenti completato.");
     }
 
+    /**
+     * Converte un oggetto TransactionData (DTO) in un'entità Transaction.
+     * Effettua il parsing delle date e imposta l'importo e la valuta.
+     *
+     * @param dto Il DTO della transazione da convertire.
+     * @return L'entità Transaction popolata con i dati del DTO.
+     */
     private Transaction fromDto(TransactionData dto) {
         Transaction transaction = new Transaction();
         transaction.setTransactionId(dto.transactionId);
@@ -215,6 +245,15 @@ public class TransactionService {
         return transaction;
     }
 
+    /**
+     * Ricerca le transazioni nel database basandosi su vari criteri.
+     *
+     * @param accountId L'ID dell'account per cui cercare le transazioni.
+     * @param fromDate La data di inizio del periodo di ricerca (inclusa).
+     * @param toDate La data di fine del periodo di ricerca (esclusa).
+     * @param centerType Il tipo di centro di costo/ricavo per filtrare le transazioni.
+     * @return Una lista di transazioni che corrispondono ai criteri di ricerca.
+     */
     public List<Transaction> searchTransactions(
             String accountId,
             LocalDate fromDate,
@@ -248,6 +287,15 @@ public class TransactionService {
         return transactionRepo.find(queryBuilder.toString(), parameters).list();
     }
 
+    /**
+     * Carica i movimenti delle transazioni da un file JSON locale.
+     * Il file deve essere presente nella cartella 'src/main/resources/test-data/'.
+     *
+     * @param filename Il nome del file JSON da cui caricare le transazioni.
+     * @param targetAccountId L'ID dell'account a cui associare le transazioni caricate.
+     * @throws IOException Se il file non viene trovato o il formato JSON non è valido.
+     */
+    //forse meglio spostare anche questo?? chiedere!
     @Transactional
     public void loadFromFile(String filename, String targetAccountId) throws IOException {
         log.info("Tentativo di importare movimenti dal file: {}", (Object) filename);
@@ -269,156 +317,4 @@ public class TransactionService {
 
     }
 
-    // --- NUOVO METODO PER RECUPERARE LA LISTA DEI CONTI DALL'API ESTERNA ---
-    public CredemAccountResponse fetchAccounts() {
-        log.info("Tentativo di recuperare la lista degli account da CredemClient.");
-        String token = mockCbiAuthService.getAccessToken(); // Ottiene il token TPP mockato
-
-        String xRequestId = "req-" + UUID.randomUUID().toString();
-        String dateHeader = OffsetDateTime.now(ZoneOffset.UTC).format(HTTP_DATE_FORMATTER);
-        String psuAuthorization = mockCbiAuthService.getPsuAccessToken(psuId, mockConsentId);
-
-        try {
-            CredemAccountResponse accountResponse = credemClient.getAccounts(
-                    psuId,
-                    token, 
-                    mockConsentId,
-                    xRequestId,
-                    dateHeader,
-                    MOCK_DIGEST, 
-                    MOCK_SIGNATURE, 
-                    MOCK_TPP_CERTIFICATE, 
-                    psuAuthorization,
-                    MOCK_PSU_IP_ADDRESS,
-                    MOCK_ASPSP_CODE
-            );
-            return accountResponse;
-        } catch (Exception e) {
-            log.error("Errore durante il recupero degli account dal CredemClient: {}", (Object) e.getMessage(), e);
-            throw new RuntimeException("Impossibile recuperare i conti dalla banca esterna.", e);
-        }
-    }
-
-    public String getAccountIdForOperations() {
-        log.info("Tentativo di recuperare un accountId dinamico da CredemClient.");
-        try {
-            CredemAccountResponse accountResponse = fetchAccounts();
-            if (accountResponse != null && accountResponse.accounts != null && !accountResponse.accounts.isEmpty()) {
-                Optional<String> preferredAccountId = accountResponse.accounts.stream()
-                        .filter(account -> defaultAccountIdForOperations.equals(account.resourceId))
-                        .map(account -> account.resourceId)
-                        .findFirst();
-
-                if (preferredAccountId.isPresent()) {
-                    log.info("AccountId preferito '{}' recuperato con successo dalla lista degli account.",
-                            (Object) preferredAccountId.get());
-                    return preferredAccountId.get();
-                } else {
-                    String firstAccountId = accountResponse.accounts.get(0).resourceId;
-                    log.warn(
-                            "AccountId preferito '{}' non trovato nella lista degli account. Utilizzo il primo account disponibile: {}",
-                            (Object) defaultAccountIdForOperations, (Object) firstAccountId);
-                    return firstAccountId;
-                }
-            } else {
-                log.warn(
-                        "Nessun account trovato tramite CredemClient. Utilizzo l'accountId predefinito di fallback: {}",
-                        (Object) defaultAccountIdForOperations);
-                return defaultAccountIdForOperations;
-            }
-        } catch (Exception e) {
-            log.error(
-                    "Errore durante il recupero dinamico degli account da CredemClient. Utilizzo l'accountId predefinito di fallback: {}. Errore: {}",
-                    (Object) defaultAccountIdForOperations, (Object) e.getMessage(), e);
-            return defaultAccountIdForOperations;
-        }
-    }
-
-    public CredemSingleAccountResponse getSpecificAccountDetails(String accountId, Boolean withBalance) {
-        log.info("Tentativo di recuperare i dettagli per l'account: {} con saldo: {}", (Object) accountId, (Object) withBalance);
-        try {
-            String token = mockCbiAuthService.getAccessToken();
-            String xRequestId = "req-" + UUID.randomUUID().toString();
-            String dateHeader = OffsetDateTime.now(ZoneOffset.UTC).format(HTTP_DATE_FORMATTER);
-            String psuAuthorization = mockCbiAuthService.getPsuAccessToken(psuId, mockConsentId);
-
-            CredemSingleAccountResponse response = credemClient.getAccountDetails(
-                    accountId,
-                    mockConsentId,
-                    psuId,
-                    token,
-                    xRequestId,
-                    dateHeader,
-                    MOCK_DIGEST,
-                    MOCK_SIGNATURE,
-                    MOCK_TPP_CERTIFICATE, 
-                    psuAuthorization,
-                    MOCK_PSU_IP_ADDRESS,
-                    MOCK_ASPSP_CODE,
-                    withBalance
-            );
-
-            if (response != null && response.account != null) {
-                log.info("Dettagli account recuperati per: {}. IBAN: {}", (Object) accountId, (Object) response.account.iban);
-
-                if (response.account.balances != null && !response.account.balances.isEmpty()) {
-                    response.account.balances.forEach(balance -> {
-                        log.info("Saldo disponibile: {} {} (Tipo: {})",
-                                (Object) balance.amount,
-                                (Object) balance.currency,
-                                (Object) balance.balanceType);
-                    });
-                } else {
-                    log.info("Nessun saldo disponibile per l'account: {}", (Object) accountId);
-                }
-            } else {
-                log.warn("Nessun dettaglio account trovato per: {} o risposta malformata", (Object) accountId);
-            }
-
-            return response;
-        } catch (Exception e) {
-            log.error("Errore durante il recupero dei dettagli dell'account {}: {}", (Object) accountId, (Object) e.getMessage(), e);
-            return null;
-        }
-    }
-
-
-    public CredemBalancesResponse getBalancesForSpecificAccount(String accountId) {
-        log.info("Tentativo di recuperare i saldi per l'account: {}", (Object) accountId);
-        try {
-            String token = mockCbiAuthService.getAccessToken();
-            String xRequestId = "req-" + UUID.randomUUID().toString();
-            String dateHeader = OffsetDateTime.now(ZoneOffset.UTC).format(HTTP_DATE_FORMATTER);
-            String psuAuthorization = mockCbiAuthService.getPsuAccessToken(psuId, mockConsentId);
-
-            CredemBalancesResponse response = credemClient.getAccountBalances(
-                    accountId,
-                    mockConsentId,
-                    psuId,
-                    token,
-                    xRequestId,
-                    dateHeader,
-                    MOCK_DIGEST, 
-                    MOCK_SIGNATURE, 
-                    MOCK_TPP_CERTIFICATE,
-                    psuAuthorization,
-                    MOCK_PSU_IP_ADDRESS,
-                    MOCK_ASPSP_CODE
-            );
-
-            if (response != null && response.balances != null && !response.balances.isEmpty()) {
-                log.info("Saldi recuperati per l'account: {}", (Object) accountId);
-                response.balances.forEach(balance -> {
-                    log.info("Saldo: {} {}, Tipo: {}, Data Ultimo Aggiornamento: {}",
-                            (Object) balance.amount, (Object) balance.currency, (Object) balance.balanceType, (Object) balance.lastChangeDateTime);
-                });
-            } else {
-                log.warn("Nessun saldo trovato per l'account: {} o risposta malformata", (Object) accountId);
-            }
-            return response;
-        } catch (Exception e) {
-            log.error("Errore durante il recupero dei saldi dell'account {}: {}", (Object) accountId, (Object) e.getMessage(), e);
-            return null;
-        }
-    }
 }

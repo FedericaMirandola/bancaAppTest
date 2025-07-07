@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 
 import it.coderit.banktestapp.model.Transaction;
@@ -26,6 +23,13 @@ public class ClassificationRuleRepository implements PanacheRepository<Classific
     @Inject
     EntityManager em;
 
+    /**
+     * Trova il CenterType corrispondente a una transazione cercando le parole chiave delle regole
+     * nei campi rilevanti della transazione (remittance information, creditor/debtor name, proprietary bank transaction code).
+     *
+     * @param transaction La transazione da classificare.
+     * @return Un Optional contenente il CenterType se una regola corrisponde, altrimenti un Optional vuoto.
+     */
     public Optional<CenterType> findCenterByJeyWord(Transaction transaction) {
         List<ClassificationRule> allRules = listAll();
 
@@ -58,6 +62,13 @@ public class ClassificationRuleRepository implements PanacheRepository<Classific
         return Optional.empty();
     }
 
+    /**
+     * Salva una nuova regola di classificazione se una regola con la stessa parola chiave (case-insensitive)
+     * non esiste già.
+     *
+     * @param keyword La parola chiave della regola.
+     * @param center Il CenterType associato alla parola chiave.
+     */
     public void saveIfNotExists(String keyword, CenterType center) {
         boolean exist = find("LOWER(keyword) = ?1", keyword.toLowerCase()).firstResultOptional().isPresent();
         if (!exist) {
@@ -69,8 +80,23 @@ public class ClassificationRuleRepository implements PanacheRepository<Classific
         }
     }
 
+    /**
+     * Trova una regola di classificazione per la sua parola chiave.
+     *
+     * @param keyword La parola chiave da cercare.
+     * @return Un Optional contenente la ClassificationRule se trovata, altrimenti un Optional vuoto.
+     */
+    public Optional<ClassificationRule> findByKeyword(String keyword) {
+        return find("LOWER(keyword) = ?1", keyword.toLowerCase()).firstResultOptional();
+    }
+
+
+    /**
+     * Restituisce tutte le regole di classificazione presenti nel database.
+     *
+     * @return Una lista di tutte le ClassificationRule.
+     */
     public List<ClassificationRule> findAllRegole() {
         return listAll();
     }
-
 }

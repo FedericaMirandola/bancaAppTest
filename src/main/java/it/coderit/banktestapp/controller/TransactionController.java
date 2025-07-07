@@ -86,7 +86,7 @@ public class TransactionController {
                 centerType = CenterType.fromName(centerTypeStr);
             } catch (IllegalArgumentException e) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Tipo center non valido. Valori possibili: COSTO, PROFITTO").build();
+                        .entity("Tipo center non valido. Valori possibili: COSTO, PROFITTO, UNDEFINED").build();
             }
         }
 
@@ -111,7 +111,7 @@ public class TransactionController {
     }
 
     @PUT
-    @Path("/{transactionId}/manually-classify")
+    @Path("/{transactionId}/manual-classify")
     @Transactional
     public Response manuallyClassify(
         @PathParam("transactionId") String transactionId,

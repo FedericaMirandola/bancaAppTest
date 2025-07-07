@@ -1,4 +1,4 @@
-package it.coderit.banktestapp.service;
+package it.coderit.banktestapp.CBISimulation;
 
 import jakarta.enterprise.context.ApplicationScoped;
 
