@@ -25,6 +25,6 @@ public class CredemBalancesResponse {
         public String msisdn;
         public String currency;
 
-        // Aggiungi altri campi se necessario
+        
     }
 }

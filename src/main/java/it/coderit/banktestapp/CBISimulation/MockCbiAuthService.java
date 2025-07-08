@@ -23,7 +23,6 @@ public class MockCbiAuthService {
     
     // Restituisce un'autorizzazione PSU mockata.
     public String getPsuAccessToken(String psuId, String consentId) {
-        // Possiamo includere psuId e consentId nel mock per debugging, ma la stringa è fissa
         return MOCK_PSU_AUTHORIZATION + "_PSU_" + psuId + "_CONSENT_" + consentId;
     }
 

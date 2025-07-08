@@ -23,40 +23,21 @@ public class FakeCredemClient implements CredemClient {
     @Override
     public CredemTransactionResponse getTransactions(
             String psuId,
-            String authorization, // Corretto: 'token' è Authorization
+            String authorization, 
             String xRequestId,
             String consentId,
-            String date, // Corretto: 'dateHeader' è Date
-            String digest, // NUOVO
-            String signature, // NUOVO
-            String tppSignatureCertificate, // NUOVO
-            String psuAuthorization, // NUOVO
-            String psuIpAddress, // NUOVO
-            String aspspCode, // NUOVO
+            String date, 
+            String digest, 
+            String signature, 
+            String tppSignatureCertificate,
+            String psuAuthorization,
+            String psuIpAddress, 
+            String aspspCode, 
             String accountId,
-            String fromBookingDate, // Corretto: 'dateFrom' è fromBookingDate
-            String toBookingDate, // Corretto: 'dateTo' è toBookingDate
+            String fromBookingDate, 
+            String toBookingDate, 
             Integer limit,
             Integer offset) {
-
-        // Stampa i valori degli header per debugging
-        System.out.println("FakeCredemClient - getTransactions Headers:");
-        System.out.println("  PSU-ID: " + psuId);
-        System.out.println("  Authorization: " + authorization);
-        System.out.println("  X-Request-ID: " + xRequestId);
-        System.out.println("  Consent-ID: " + consentId);
-        System.out.println("  Date: " + date);
-        System.out.println("  Digest: " + digest);
-        System.out.println("  Signature: " + signature);
-        System.out.println("  TPP-Signature-Certificate: " + tppSignatureCertificate);
-        System.out.println("  PSU-Authorization: " + psuAuthorization);
-        System.out.println("  PSU-IP-Address: " + psuIpAddress);
-        System.out.println("  ASPSP-Code: " + aspspCode);
-        System.out.println("  AccountId: " + accountId);
-        System.out.println("  fromBookingDate: " + fromBookingDate);
-        System.out.println("  toBookingDate: " + toBookingDate);
-        System.out.println("  limit: " + limit);
-        System.out.println("  offset: " + offset);
 
 
         String resourcePath;
@@ -91,7 +72,7 @@ public class FakeCredemClient implements CredemClient {
     @Override
     public CredemAccountResponse getAccounts(
             String psuId,
-            String authorization, // Corretto: 'token' è Authorization
+            String authorization, 
             String consentId,
             String xRequestId,
             String date, 
@@ -103,19 +84,6 @@ public class FakeCredemClient implements CredemClient {
             String aspspCode 
             ) {
 
-        // Stampa i valori degli header per debugging
-        System.out.println("FakeCredemClient - getAccounts Headers:");
-        System.out.println("  PSU-ID: " + psuId);
-        System.out.println("  Authorization: " + authorization);
-        System.out.println("  Consent-ID: " + consentId);
-        System.out.println("  X-Request-ID: " + xRequestId);
-        System.out.println("  Date: " + date);
-        System.out.println("  Digest: " + digest);
-        System.out.println("  Signature: " + signature);
-        System.out.println("  TPP-Signature-Certificate: " + tppSignatureCertificate);
-        System.out.println("  PSU-Authorization: " + psuAuthorization);
-        System.out.println("  PSU-IP-Address: " + psuIpAddress);
-        System.out.println("  ASPSP-Code: " + aspspCode);
 
         String resourcePath = "test-data/accounts.json";
 

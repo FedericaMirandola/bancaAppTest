@@ -47,10 +47,7 @@ public class ClassificationRuleRepository implements PanacheRepository<Classific
 
     /**
      * Trova il CenterType corrispondente a una transazione cercando le parole chiave delle regole
-     * nei campi rilevanti della transazione (remittance information, creditor/debtor name, proprietary bank transaction code).
-     *
-     * @param transaction La transazione da classificare.
-     * @return Un Optional contenente il CenterType se una regola corrisponde, altrimenti un Optional vuoto.
+     * nei campi rilevanti della transazione (remittance information, creditor/debtor name, additional information).
      */
     public Optional<CenterType> findCenterByKeyword(Transaction transaction) {
         List<ClassificationRule> allRules = listAll();
