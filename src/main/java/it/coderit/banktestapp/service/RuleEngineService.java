@@ -27,7 +27,7 @@ public class RuleEngineService {
             log.debug("Transazione {} classificata manualmente.Salta la classificazione automatica!", transaction.getTransactionId());
             return;
         }
-        regolaClassificazioneRepository.findCenterByJeyWord(transaction)
+        regolaClassificazioneRepository.findCenterByKeyword(transaction)
         .ifPresentOrElse(
             //se una regola matcha il centerType allora la assegna ad un centro
             matchedCenterType -> {

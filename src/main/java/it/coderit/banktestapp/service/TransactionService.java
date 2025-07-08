@@ -287,14 +287,9 @@ public class TransactionService {
         return transactionRepo.find(queryBuilder.toString(), parameters).list();
     }
 
-    /**
-     * Carica i movimenti delle transazioni da un file JSON locale.
-     * Il file deve essere presente nella cartella 'src/main/resources/test-data/'.
-     *
-     * @param filename Il nome del file JSON da cui caricare le transazioni.
-     * @param targetAccountId L'ID dell'account a cui associare le transazioni caricate.
-     * @throws IOException Se il file non viene trovato o il formato JSON non è valido.
-     */
+    
+    //Carica i movimenti delle transazioni da un file JSON locale.
+    
     //forse meglio spostare anche questo?? chiedere!
     @Transactional
     public void loadFromFile(String filename, String targetAccountId) throws IOException {

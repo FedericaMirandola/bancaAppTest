@@ -135,7 +135,7 @@ public class ClassificationRuleController {
             return Response.status(Response.Status.BAD_REQUEST).entity("La parola chiave non può essere vuota.").build();
         }
         if (ruleInput.getCenterType() == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Il CenterType non può essere nullo.").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Il CenterType non può essere vuoto.").build();
         }
         if (ruleInput.getCenterType() == CenterType.UNDEFINED) {
              return Response.status(Response.Status.BAD_REQUEST).entity("Non è possibile classificare manualmente una regola come UNDEFINED.").build();
